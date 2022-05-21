@@ -52,6 +52,8 @@ update_mat_rc(Mc,R,C,V,Mu) :-
     nth0(R,Mu,Ru,Mt).
 
 
+
+
 kk:-
     create_players(2),
    % players(X,Y,(Z,W), R1,R2,R3,R4, W, B),
@@ -62,6 +64,9 @@ kk:-
     
     update_mat_rc([[1,2,3],[4,5,6],[7,8,9]],1,1,27,Z),
     %M = [[1, 2, 3], [4, x, 6], [7, 8, 9]].
-    print(Z).
+    print(Z),
+
+    nth0(2, Z, O),
+    print(O).
 
 kk.
