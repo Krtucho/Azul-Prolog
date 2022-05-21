@@ -10,7 +10,6 @@ create_player(N):-
 
 create_players(1):-
     create_player(1).
-
 create_players(N):-
     N > 1,
     N1 is N-1,
@@ -32,3 +31,5 @@ add_score(Player, Score_to_Add):-
 
 get_score(Player, Score):-
     players(Player, Score).
+
+
