@@ -8,13 +8,13 @@
 :-dynamic factories_per_player/2.
 
 
-inicialize(Players_number):-
+inicialize_game(Factories_number):-
     append_colors(),
-    append_factories_per_player(),
+    % append_factories_per_player(),
     create_bag(),
     create_cementery(),
-    create_center().
-    %create_factories(Players_number).
+    create_center(),
+    create_factories(Factories_number).
 
 % para guardar una relacion de numeros con los colores en juego
 append_colors():-
@@ -101,7 +101,7 @@ search_pos_n_on_bag(N,Acumulated,ActualColor,Color):-
     search_pos_n_on_bag(N,AcumulatedNew,ActualColor1,Color).
 
 
-%agrega el azulejo seleccionado a la lista de azulejos de la fabrica
+%agrega el azulejo seleccionado a la lista de azulejos de la fabrica de numero Factory
 append_tile_to_factory(Factory,Color):-
     factory(Factory,Tiles),
     TilesNew=[Color|Tiles],
@@ -113,7 +113,7 @@ append_tile_to_factory(Factory,Color):-
 %crea las fabricas vacias
 create_n_factories(1):-
     !,
-    assert(1,[0]).
+    assert(factory(1,[0])).
 
 create_n_factories(N):-
     N1 is N-1,
@@ -121,11 +121,11 @@ create_n_factories(N):-
     create_n_factories(N1).
 
 
-%crea las fabricas en dependencia de la cantidad de jugadores que participan
-create_factories(Players_number):-           %definir como van a ser las fabricas
-    factories_per_player(Players_number,Factories_number),
-    assert(factory(1,[0])),
-    retractall(factory(_,_)),
+%manda a crear las fabricas en dependencia de la cantidad de jugadores que participan
+create_factories(Factories_number):-           
+    % factories_per_player(Players_number,Factories_number),
+    %assert(factory(1,[0])),
+    %retractall(factory(_,_)),
     create_n_factories(Factories_number).
     %fill_factories(Factories_number).
 
@@ -134,43 +134,42 @@ rest_n_color_c_to_bag(N,C):-
     bag(C,Count),
     Count1 is Count-N,
     retract(bag(C,Count)),
-    assert(bag(C,Count1)).
+    assert(bag(C,Count1)),
+    bag('total',TotalOld),
+    TotalNew is TotalOld-N,
+    retract(bag('total',TotalOld)),
+    assert(bag('total',TotalNew)).
 
-%agrega un azulejo de color Color a la fabrica de numero Factory
 
 
 %pone 4 azulejos en la fabrica de numero factory_number
-fill_that_factory(Factory_number,0):-
-    print("caso base"),
-    !.
+fill_that_factory(Factory_number,0):-!.    
 fill_that_factory(Factory_number,N):-
-    print(Factory_number),
-    print('                   '),
+    % print(Factory_number),
+    % print('                   '),
     Count1 is N-1,
-    print(Count1),
-    print('                   '),
+    % print(Count1),
+    % print('                   '),
     bag('total',Len),
-    print(Len),
-    print('                   '),
+    % print(Len),
+    % print('                   '),
     random(1,Len,Random),
-    print(Random),
-    print('                   '),
+    % print(Random),
+    % print('                   '),
     search_pos_n_on_bag(Random,0,1,Color),
-    print(Color),
-    print('                   '),
+    % print(Color),
+    % print('                   '),
     colors(Color,ColorString),
-    print(ColorString),
-    print('                   '),
-
-    append_tile_to_factory(Factory_number,ColorString),
-    
+    % print(ColorString),
+    % print('                   '),
+    append_tile_to_factory(Factory_number,ColorString),    
     rest_n_color_c_to_bag(1,ColorString),
-
-    fill_that_factory(Count1).   
+    fill_that_factory(Factory_number,Count1).   
 
 
 % primera seccion de la ronda  en donde se rellenan todas las factorias
-fill_factories(1):-fill_that_factory(1).
+fill_factories(1):-!,
+    fill_that_factory(1,4).
 fill_factories(Factories_number):-
     N1 is Factories_number-1,
     fill_that_factory(Factories_number,4),
@@ -184,4 +183,30 @@ play_to_end_round():-.
 end_of_round():-.
 
 % cuarta seccion de la ronda en donde se realiza la comprobacion de que se cumplan las condiciones de finalizacion del juego
-comprobate_end_game():-.
+comprobate_end_game():-
+    .
+
+
+%desarrollo de una ronda
+
+round(Players_number,Factories_number):-
+    fill_factories(Factories_number).
+    % play_to_end_round(),
+    % end_of_round(),
+    % comprobate_end_game().
+
+
+
+
+
+start_game(Players_number):-
+    % append_colors(),
+    % append_factories_per_player(),
+    % create_bag(),
+    % create_cementery(),
+    append_factories_per_player(),
+    factories_per_player(Players_number,Factories_number),
+    inicialize_game(Factories_number),
+    % create_players(Players_number),
+    %create_factories(Players_number),
+    round(Players_number,Factories_number).
