@@ -14,7 +14,7 @@
 
 % Agrega la clausula a player de un nuevo jugador numero N y con puntuacion=0
 create_player(N):-
-    assert(players(N, 0, (0,0), (0,0), (0,0), (0,0), (0,0), [], [] )),!. % Agregamos una clausula nueva al predicado players
+    assert(players(N, 0, (0,0), (0,0), (0,0), (0,0), (0,0), [], 0 )),!. % Agregamos una clausula nueva al predicado players
 
 % Caso base, se crea 1 jugador
 create_players(1):-
@@ -60,13 +60,15 @@ update_R3(P, R3):-
 
 % Actualizar Piso 4 de la escalera
 update_R4(P, R4):-
-    retract(players(Player, S, R1, R2, R3,R4,R5, M, D)),
+    retract(players(Player, S, R1, R2, R3,_,R5, M, D)),
     assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 5 de la escalera
-update_R3(P, R5):-
+update_R5(P, R5):-
     retract(players(Player, S, R1, R2, R3,R4,_, M, D)),
     assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+
+can_set_tiles_in_row():-
 
 
 % Calcular la puntuacion a restar con n fichas descartadas.
