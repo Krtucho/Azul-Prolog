@@ -113,11 +113,11 @@ append_tile_to_factory(Factory,Color):-
 %crea las fabricas vacias
 create_n_factories(1):-
     !,
-    assert(factory(1,[0])).
+    assert(factory(1,[])).
 
 create_n_factories(N):-
     N1 is N-1,
-    assert(factory(N,[0])),
+    assert(factory(N,[])),
     create_n_factories(N1).
 
 
@@ -186,10 +186,9 @@ end_of_round():-.
 comprobate_end_game():-
     .
 
-
 %desarrollo de una ronda
-
 round(Players_number,Factories_number):-
+    % print("entro a round   "),
     fill_factories(Factories_number).
     % play_to_end_round(),
     % end_of_round(),
@@ -207,4 +206,6 @@ start_game(Players_number):-
     inicialize_game(Factories_number),
     % create_players(Players_number),
     %create_factories(Players_number),
+    % print("voy a entrar a round    "),
     round(Players_number,Factories_number).
+    % print("salgo de round    ").
