@@ -88,10 +88,20 @@ update_R5(P, R5):-
 %assert(colors(4,'rojo')),
 %assert(colors(5,'blanco')).
 
-% Player
-% Color
-% Amount
-% Row
+% Ubica las fichas(A=cantidad de fichas) de color C en el jugador P en la fila R
+% P -> Player
+% C -> Color
+% A -> Amount
+% R -> Row
+update_row(P, C, A, 1):-
+    update_R1(P, (C,A))
+
+% Dice si es posible ubicar las fichas(A=cantidad de fichas) de color C en el jugador P en la fila R
+% P -> Player
+% C -> Color
+% A -> Amount
+% R -> Row
+% NewA -> En caso de poder actualizarse cual seria la nueva cantidad, de no poder actualizarse la cantidad seria 0
 can_set_tiles_in_row(P,C, A, 1):-
     players(P, _, R1, _, _, _, _, _, _),
 
