@@ -31,3 +31,5 @@ getCol(blanco, 2, 1).
 getCol(blanco, 3, 2).
 getCol(blanco, 4, 3).
 getCol(blanco, 5, 4).
+
+valid_pos_to_insert_tile()

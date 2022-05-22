@@ -8,13 +8,26 @@
 % R3 -> Piso 3 de la escalera      _ _ _
 % R4 -> Piso 4 de la escalera    _ _ _ _
 % R5 -> Piso 5 de la escalera  _ _ _ _ _
-% M -> Mosaico o Matriz de la derecha
+% M -> Mosaico o Matriz de la derecha o Muro
 % D -> Fichas descartadas(Dropped Tiles)
-:- dynamic players/9.
+:- dynamic players/9, 
+    first_player/1. % Jugador que comenzo jugando esta ronda(Tenia la ficha 1)
+
+update_first_player(P):-
+    retractall(first_player(_)),
+    assert(first_player(P)).
 
 % Agrega la clausula a player de un nuevo jugador numero N y con puntuacion=0
 create_player(N):-
-    assert(players(N, 0, (0,0), (0,0), (0,0), (0,0), (0,0), [], 0 )),!. % Agregamos una clausula nueva al predicado players
+    assert(players(N, 0, (0,0), (0,0), (0,0), (0,0), (0,0), 
+    [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ]
+    , 0 )),!. % Agregamos una clausula nueva al predicado players
 
 % Caso base, se crea 1 jugador
 create_players(1):-
@@ -68,7 +81,19 @@ update_R5(P, R5):-
     retract(players(Player, S, R1, R2, R3,R4,_, M, D)),
     assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
 
-can_set_tiles_in_row():-
+
+%assert(colors(1,'negro')),
+%assert(colors(2,'azul')),
+%assert(colors(3,'amarillo')),
+%assert(colors(4,'rojo')),
+%assert(colors(5,'blanco')).
+
+% Player
+% Color
+% Amount
+% Row
+can_set_tiles_in_row(P,C, A, 1):-
+    players(P, _, R1, _, _, _, _, _, _),
 
 
 % Calcular la puntuacion a restar con n fichas descartadas.
