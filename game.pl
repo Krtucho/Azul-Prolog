@@ -197,8 +197,6 @@ round(Players_number,Factories_number):-
 
 
 
-
-
 start_game(Players_number):-
     % append_colors(),
     % append_factories_per_player(),
