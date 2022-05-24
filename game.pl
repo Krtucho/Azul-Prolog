@@ -42,11 +42,19 @@ append_play(Factories_number,Color):-
     plays(Factories_number,Color,Count),
     retract(plays(Factories_number,Color,Count)),
     Count1 is Count+1,
-    assert(plays(Factories_number,Color,Count1)).
+    assert(plays(Factories_num/ber,Color,Count1)).
 
 %cuando se realiza una jugada se encarga de quitar esa jugada y enviar el resto de las fichas de esa fabrica al centro
-% update_plays(Factory_number,Color):-.
+update_plays(Factory_number,Color):-.
 
+%de todas las jugadas posibles, el jugador escoge una random
+choose_play(Factory_number,Color):-.
+
+%el jugador actual toma el color Color de la fabrica Factories number y coloca los azulejos en su escalera
+play(Actual_Player,Factories_number,Color):-.
+
+%comprueba si no quedan jugadas por tomar (plays) esta vacio
+end_round(End):-.
 
 
 % lugar donde se van las fichas al ser descartadas de los tableros de los jugadores

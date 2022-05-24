@@ -12,7 +12,20 @@ fill_factories(Factories_number):-
 
 
 %segunda seccion de la ronda en donde todos los jugadores juegan hasta que se acaben todas las fichas de las fabricas y del centro
-play_to_end_round():-.
+%se le pasa 0 si se acabaron las jugadas posibles y por tanto se acabo la ronda y 1 significa que no ha acabado
+%se le pasa el jugador actual 
+play_to_end_round(0,Actual_Player,Players_number):-!.
+play_to_end_round(1,Actual_Player):-
+    choose_play(Factories_number,Color),
+    update_plays(Factories_number,Color),
+    play(Actual_Player,Factories_number,Color),
+    Actual_Player1 is  Actual_Player+1,
+    Actual_Player_mod is Actual_Player1 mod Players_number,
+    Actual_Player_mod1 is Actual_Player_mod+1,
+    end_round(End),
+    play_to_end_round(End,Actual_Player_mod1).
+
+
 
 %tercera seccion de la ronda en donde se colocan los azulejos de las escaleras de los jugadores en sus mosaicos y se suman las puntuaciones
 end_of_round():-.
@@ -25,26 +38,17 @@ comprobate_end_game():-
 round(Players_number,Factories_number):-
     % print("entro a round   "),
     fill_factories(Factories_number),
-    create_plays(Factories_number).
-    % play_to_end_round(),
+    create_plays(Factories_number),
+    %aqui buscar el primer jugador de esta ronda
+    play_to_end_round(1,Actual_Player).
     % end_of_round(),
     % comprobate_end_game().
 
 
 
 start_game(Players_number):-
-    % append_colors(),
-    % append_factories_per_player(),
-    % create_bag(),
-    % create_cementery(),
-    % append_factories_per_player(),
     factories_per_player(Players_number,Factories_number),
     inicialize_game(Factories_number),
-    
-    % create_players(Players_number),
-    %create_factories(Players_number),
-    % print("voy a entrar a round    "),
     round(Players_number,Factories_number).
-    % print("salgo de round    ").
 
 
