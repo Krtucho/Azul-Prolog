@@ -1,5 +1,6 @@
 [game_utils].
 
+
 inicialize_game(Factories_number):-
     % append_colors(),
     % append_factories_per_player(),
@@ -55,7 +56,7 @@ choose_play(Factory_number,Color):-
     % print(Total),    
     % print("           "),
     findall((Factory_number,Color),(plays(Factory_number,Color,Cant),not_total(Factory_number)),Factories),
-    print(Factories),
+    % print(Factories),
     % print("           "),
     % random(1,Total,Random),
     random(1,Total,Random),
