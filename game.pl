@@ -1,15 +1,28 @@
+
 % aqui esta representada la bolsa del juego con los pares(color, cantidad de azulejos de ese color)
 :-dynamic bag/2.
 % aqui estan representadas las factorias del juego por su numero y que tiene una lista con 4 azulejos
 :-dynamic factory/2.
+% aqui esta representado el cementerio del juego con los pares(color, cantidad de azulejos de ese color)
 :-dynamic cementery/2.
-:-dynamic colors/2.
+% aqui esta representado el centro del juego con los pares(color, cantidad de azulejos de ese color)
 :-dynamic center/2.
-:-dynamic factories_per_player/2.
 
+
+% :-dynamic factories_per_player/2.
+% :-dynamic colors/2.
+colors(1,'negro').
+colors(2,'azul').
+colors(3,'amarillo').
+colors(4,'rojo').
+colors(5,'blanco').
+
+factories_per_player(2,5).
+factories_per_player(3,7).
+factories_per_player(4,9).
 
 inicialize_game(Factories_number):-
-    append_colors(),
+    % append_colors(),
     % append_factories_per_player(),
     create_bag(),
     create_cementery(),
@@ -17,18 +30,18 @@ inicialize_game(Factories_number):-
     create_factories(Factories_number).
 
 % para guardar una relacion de numeros con los colores en juego
-append_colors():-
-    assert(colors(1,'negro')),
-    assert(colors(2,'azul')),
-    assert(colors(3,'amarillo')),
-    assert(colors(4,'rojo')),
-    assert(colors(5,'blanco')).
+% append_colors():-
+%     assert(colors(1,'negro')),
+%     assert(colors(2,'azul')),
+%     assert(colors(3,'amarillo')),
+%     assert(colors(4,'rojo')),
+%     assert(colors(5,'blanco')).
 
 %cantidad de fabricas que se crean segun la cantidad de jugadores de la partida
-append_factories_per_player():-
-    assert(factories_per_player(2,5)),
-    assert(factories_per_player(3,7)),
-    assert(factories_per_player(4,9)).
+% append_factories_per_player():-
+%     assert(factories_per_player(2,5)),
+%     assert(factories_per_player(3,7)),
+%     assert(factories_per_player(4,9)).
 
 
 % lugar donde se van las fichas al ser descartadas de los tableros de los jugadores
@@ -186,7 +199,7 @@ end_of_round():-.
 comprobate_end_game():-
     .
 
-%desarrollo de una ronda
+%desarrollo de una ronda 
 round(Players_number,Factories_number):-
     % print("entro a round   "),
     fill_factories(Factories_number).
@@ -196,16 +209,16 @@ round(Players_number,Factories_number):-
 
 
 
-start_game(Players_number):-
-    % append_colors(),
-    % append_factories_per_player(),
-    % create_bag(),
-    % create_cementery(),
-    append_factories_per_player(),
-    factories_per_player(Players_number,Factories_number),
-    inicialize_game(Factories_number),
-    % create_players(Players_number),
-    %create_factories(Players_number),
-    % print("voy a entrar a round    "),
-    round(Players_number,Factories_number).
-    % print("salgo de round    ").
+% start_game(Players_number):-
+%     % append_colors(),
+%     % append_factories_per_player(),
+%     % create_bag(),
+%     % create_cementery(),
+%     % append_factories_per_player(),
+%     factories_per_player(Players_number,Factories_number),
+%     inicialize_game(Factories_number),
+%     % create_players(Players_number),
+%     %create_factories(Players_number),
+%     % print("voy a entrar a round    "),
+%     round(Players_number,Factories_number).
+%     % print("salgo de round    ").
