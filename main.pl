@@ -56,3 +56,7 @@ start_game(Players_number):-
     round(Players_number,Factories_number).
 
 
+start:-
+    start_game(2).
+
+start.

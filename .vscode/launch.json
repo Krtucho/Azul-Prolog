@@ -13,7 +13,7 @@
             "env": {},
             "program": "${file}",
             "cwd": "${fileDirname}",
-            "startupQuery": "kk",
+            "startupQuery": "start",
             "stopOnEntry": true,
             "traceCmds": {
                 "continue": [
