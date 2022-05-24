@@ -3,6 +3,8 @@
 inicialize_game(Factories_number):-
     % append_colors(),
     % append_factories_per_player(),
+    % create_plays(Factories_number).
+    assert(plays(10,'total',0)),
     create_bag(),
     create_cementery(),
     create_center(),
@@ -12,18 +14,15 @@ inicialize_game(Factories_number):-
 %al principio de cada ronda se encarga de crear todas las jugadas posibles de la ronda con los azulejos que hay en las fabricas
 create_plays(0):-!.
 create_plays(Factories_number):-
-    % print("entro").
     factory(Factories_number,Colors),
     Factories_number1 is Factories_number-1,
-    % print(Factories_number),
     append_colors_to_plays(Factories_number,Colors),
     create_plays(Factories_number1).
 
 %va agregando cada color de una fabrica a las jugadas posibles
 append_colors_to_plays(Factories_number,[]):-!.
 append_colors_to_plays(Factories_number,[Color1|RColors]):-
-    % print("                 "),
-    % print(Color1),
+    % format("~n en la fabrica ~a encontro color ~a ~n",[Factories_number,Color1]),
     append_play(Factories_number,Color1),
     append_colors_to_plays(Factories_number,RColors).
 
@@ -31,31 +30,64 @@ append_colors_to_plays(Factories_number,[Color1|RColors]):-
 append_play(Factories_number,Color):-
     not(plays(Factories_number,Color,X)),
     !,
-    % print("voy a hacer assert"),
-    assert(plays(Factories_number,Color,1)).
+    plays(10,'total',Total),
+    Total1 is Total+1,
+    retract(plays(10,'total',Total)),
+    assert(plays(Factories_number,Color,1)),
+    % format("crear la jugada fabrica: ~a con color: ~a y cant nueva ~a ~n",[Factories_number,Color,1]),
+    % format("el total ahora es ~a ~n",[Total1]),
+    assert(plays(10,'total',Total1)).
 %agrega una jugada cuando el color ya estaba en la fabrica, o sea agrega 1 al contador
 append_play(Factories_number,Color):-
-    % print("entre aqui  "),
-    % print(Factories_number),
-    % print("    "),
-    % print(Color),
     plays(Factories_number,Color,Count),
     retract(plays(Factories_number,Color,Count)),
-    Count1 is Count+1,
-    assert(plays(Factories_num/ber,Color,Count1)).
+    Count1 is Count+1,    
+    % format("en la fabrica ~a se encontro el color ~a por vez ~a ~n",[Factories_number,Color,Count1]),
+    assert(plays(Factories_number,Color,Count1)).
+%indica si es el play destinado a almacenar el total de las jugadas
+not_total(N):- not(N=:=10).
+
+%de todas las jugadas posibles, el jugador escoge una random(o sea devuelve el numero de la fabrica y el color)
+choose_play(Factory_number,Color):-    
+    plays(10,'total',Total),
+    % random(1,5,RandomColor),
+    % colors(RandomColor,Color),
+    % print(Total),    
+    % print("           "),
+    findall((Factory_number,Color),(plays(Factory_number,Color,Cant),not_total(Factory_number)),Factories),
+    print(Factories),
+    % print("           "),
+    % random(1,Total,Random),
+    random(1,Total,Random),
+    % format("~n El random seleccionado es ~a ~n",[Random]),
+    search_pos_n_on_plays(Random,Factory_number,Color,Factories).
+
 
 %cuando se realiza una jugada se encarga de quitar esa jugada y enviar el resto de las fichas de esa fabrica al centro
-update_plays(Factory_number,Color):-.
+update_plays(Factory_number,Color):-
+    plays(Factories_num,Color,Count).
 
-%de todas las jugadas posibles, el jugador escoge una random
-choose_play(Factory_number,Color):-.
+%se le pasa la lista para encontrar el elemento N
+search_pos_n_on_plays(0,Factory_number,Color,[(X,Y)|_]):-!,
+    % format("~n el seleccionado es ~a ~a ~n",[X,Y]),
+    Color = Y,
+    Factory_number = X.
+search_pos_n_on_plays(N,Factory_number,Color,[(X,Y)|Factories]):-
+    % format("el par es (~a,~a)~n",[X,Y]),
+    N1 is N-1,
+    % print(N1),
+    search_pos_n_on_plays(N1,Factory_number,Color,Factories).
+
 
 %el jugador actual toma el color Color de la fabrica Factories number y coloca los azulejos en su escalera
-play(Actual_Player,Factories_number,Color):-.
+play(Actual_Player,Factories_number,Color):-
+    update_plays(Factories_number,Color).
 
 %comprueba si no quedan jugadas por tomar (plays) esta vacio
-end_round(End):-.
-
+end_round(End):-
+    plays(10,'total',Total),
+    End=Total.
+    
 
 % lugar donde se van las fichas al ser descartadas de los tableros de los jugadores
 create_cementery():-
