@@ -92,47 +92,137 @@ update_R5(P, R5):-
 % P -> Player
 % C -> Color
 % A -> Amount
-% R -> Row
+% R -> Row = 1
 update_row(P, C, A, 1):-
-    update_R1(P, (C,A))
+    update_R1(P, (C,A)).
+
+% Lo mismo que el anterior, pero Row=2
+% Row = 2
+update_row(P, C, A, 2):-
+    update_R1(P, (C,A)).
+
+% Lo mismo que el anterior, pero Row=3
+% Row = 3
+update_row(P, C, A, 3):-
+    update_R1(P, (C,A)).
+
+% Lo mismo que el anterior, pero Row=4
+% Row = 4
+update_row(P, C, A, 4):-
+    update_R1(P, (C,A)).
+
+% Lo mismo que el anterior, pero Row=5
+% Row = 5
+update_row(P, C, A, 5):-
+    update_R1(P, (C,A)).
 
 % Dice si es posible ubicar las fichas(A=cantidad de fichas) de color C en el jugador P en la fila R
 % P -> Player
 % C -> Color
 % A -> Amount
-% R -> Row
+% R -> Row = 1
 % NewA -> En caso de poder actualizarse cual seria la nueva cantidad, de no poder actualizarse la cantidad seria 0
-can_set_tiles_in_row(P,C, A, 1):-
-    players(P, _, R1, _, _, _, _, _, _),
+can_set_tiles_in_row(P,C, A, 1, NewA):-
+    players(P, _, (C1,A1) = R1, _, _, _, _, _, _),
+    C1 =:= C,
+    A + A1 =< 1,
+    NewA is A + A1.
 
+% Lo mismo que el anterior, pero Row=2
+% Row = 2
+can_set_tiles_in_row(P,C, A, 2, NewA):-
+    players(P, _, _, (C1,A1) = R2, _, _, _, _, _),
+    C1 =:= C,
+    A + A1 =< 1,
+    NewA is A + A1.
+
+% Lo mismo que el anterior, pero Row=3
+% Row = 3
+can_set_tiles_in_row(P,C, A, 3, NewA):-
+    players(P, _, _,_, (C1,A1) = R3,  _, _, _, _),
+    C1 =:= 0;
+    C1 =:= C,
+    A + A1 =< 1,
+    NewA is A + A1.
+% Lo mismo que el anterior, pero Row=4
+% Row = 4
+can_set_tiles_in_row(P,C, A, 4, NewA):-
+    players(P, _, _,_,_, (C1,A1) = R4, _, _, _),
+    C1 =:= 0;
+    C1 =:= C,
+    A + A1 =< 1,
+    NewA is A + A1.
+
+% Lo mismo que el anterior, pero Row=5
+% Row = 5
+can_set_tiles_in_row(P,C, A, 5, NewA):-
+    players(P, _, _,_,_, _, (C1,A1) = R5, _, _),
+    C1 =:= 0;
+    C1 =:= C,
+    A + A1 =< 1,
+    NewA is A + A1.
 
 % Calcular la puntuacion a restar con n fichas descartadas.
 % N numero de fichas descartadas(se incluye la ficha de jugadr inicial)
 % S valor en numeros negativos a descontar o 0 si N es 0
-calculateDropScore(0, 0).
-calculateDropScore(1, -1).
-calculateDropScore(2, -2).
-calculateDropScore(3, -4).
-calculateDropScore(4, -6).
-calculateDropScore(5, -8).
-calculateDropScore(6, -11).
-calculateDropScore(7, -14).
-calculateDropScore(N, -14) :-
+get_negative_score(0, 0).
+get_negative_score(1, -1).
+get_negative_score(2, -2).
+get_negative_score(3, -4).
+get_negative_score(4, -6).
+get_negative_score(5, -8).
+get_negative_score(6, -11).
+get_negative_score(7, -14).
+get_negative_score(N, -14) :-
     N > 7.
+
+% Devuelve la puntuacion a restar del jugador con indice P
+% P -> Numero del jugador
+% S valor en numeros negativos a descontar o 0 si N es 0
+get_negative_score_for_player(P, S):-
+    players(P, _, _, _,_,_,_, _, D),
+    get_negative_score(D, S).
 
 % Actualizar cantidad de piezas descartadas
 update_dropped_tiles(P, D):-
     retract(players(P, Score,R1, R2,R3,R4,R5, M, _)),
     assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
+% El jugador descarte una ficha
+% P -> Inndice del jugador
+% D1 -> Cantidad de fichas que ha descartado luego de descartar esta ultima
+drop_tile(P, D1) :-
+    players(P, _, D, _,_,_,_,_,_),
+    D1 =\= 0,
+    !.
+    players(P, _, _, _,_,_,_,_,D),
+    D1 is D + 1,
+    update_dropped_tiles(P, D1),
+    !.
+
+% El jugador descarta 1 fichas(caso base de descartar n fichas)
+% P -> Inndice del jugador
+% 1 -> Cantidad de fichas a descartar
+% D1 -> Cantidad de fichas que ha descartado luego de descartar esta ultima
+drop_tiles(P, 1, D1) :-
+    drop_tile(P, D1),
+    !.
+
+% El jugador descarta N fichas
+% P -> Indice del jugador
+% N -> Cantidad de fichas a descartar
+% D1 -> Cantidad de fichas que ha descartado luego de descartar esta ultima
+drop_tiles(P, N, D1) :-
+    N > 1,
+    N1 is N - 1,
+    drop_tiles(P, N1, _),
+    drop_tile(P, D1),
+    !.
+
 % Actualizar matriz de la derecha(Muro)
 update_matrix(P, M):-
     retract(players(P, Score,R1, R2,R3,R4,R5, _, D)),
     assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
-
-
-
-
 
 kk:-
     create_players(2),

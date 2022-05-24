@@ -1,25 +1,4 @@
-
-% aqui esta representada la bolsa del juego con los pares(color, cantidad de azulejos de ese color)
-:-dynamic bag/2.
-% aqui estan representadas las factorias del juego por su numero y que tiene una lista con 4 azulejos
-:-dynamic factory/2.
-% aqui esta representado el cementerio del juego con los pares(color, cantidad de azulejos de ese color)
-:-dynamic cementery/2.
-% aqui esta representado el centro del juego con los pares(color, cantidad de azulejos de ese color)
-:-dynamic center/2.
-
-
-% :-dynamic factories_per_player/2.
-% :-dynamic colors/2.
-colors(1,'negro').
-colors(2,'azul').
-colors(3,'amarillo').
-colors(4,'rojo').
-colors(5,'blanco').
-
-factories_per_player(2,5).
-factories_per_player(3,7).
-factories_per_player(4,9).
+[game_utils].
 
 inicialize_game(Factories_number):-
     % append_colors(),
@@ -29,19 +8,45 @@ inicialize_game(Factories_number):-
     create_center(),
     create_factories(Factories_number).
 
-% para guardar una relacion de numeros con los colores en juego
-% append_colors():-
-%     assert(colors(1,'negro')),
-%     assert(colors(2,'azul')),
-%     assert(colors(3,'amarillo')),
-%     assert(colors(4,'rojo')),
-%     assert(colors(5,'blanco')).
 
-%cantidad de fabricas que se crean segun la cantidad de jugadores de la partida
-% append_factories_per_player():-
-%     assert(factories_per_player(2,5)),
-%     assert(factories_per_player(3,7)),
-%     assert(factories_per_player(4,9)).
+%al principio de cada ronda se encarga de crear todas las jugadas posibles de la ronda con los azulejos que hay en las fabricas
+create_plays(0):-!.
+create_plays(Factories_number):-
+    % print("entro").
+    factory(Factories_number,Colors),
+    Factories_number1 is Factories_number-1,
+    % print(Factories_number),
+    append_colors_to_plays(Factories_number,Colors),
+    create_plays(Factories_number1).
+
+%va agregando cada color de una fabrica a las jugadas posibles
+append_colors_to_plays(Factories_number,[]):-!.
+append_colors_to_plays(Factories_number,[Color1|RColors]):-
+    % print("                 "),
+    % print(Color1),
+    append_play(Factories_number,Color1),
+    append_colors_to_plays(Factories_number,RColors).
+
+%agrega una jugada cuando el color aun no estaba registrado
+append_play(Factories_number,Color):-
+    not(plays(Factories_number,Color,X)),
+    !,
+    % print("voy a hacer assert"),
+    assert(plays(Factories_number,Color,1)).
+%agrega una jugada cuando el color ya estaba en la fabrica, o sea agrega 1 al contador
+append_play(Factories_number,Color):-
+    % print("entre aqui  "),
+    % print(Factories_number),
+    % print("    "),
+    % print(Color),
+    plays(Factories_number,Color,Count),
+    retract(plays(Factories_number,Color,Count)),
+    Count1 is Count+1,
+    assert(plays(Factories_number,Color,Count1)).
+
+%cuando se realiza una jugada se encarga de quitar esa jugada y enviar el resto de las fichas de esa fabrica al centro
+% update_plays(Factory_number,Color):-.
+
 
 
 % lugar donde se van las fichas al ser descartadas de los tableros de los jugadores
@@ -158,67 +163,12 @@ rest_n_color_c_to_bag(N,C):-
 %pone 4 azulejos en la fabrica de numero factory_number
 fill_that_factory(Factory_number,0):-!.    
 fill_that_factory(Factory_number,N):-
-    % print(Factory_number),
-    % print('                   '),
     Count1 is N-1,
-    % print(Count1),
-    % print('                   '),
     bag('total',Len),
-    % print(Len),
-    % print('                   '),
     random(1,Len,Random),
-    % print(Random),
-    % print('                   '),
     search_pos_n_on_bag(Random,0,1,Color),
-    % print(Color),
-    % print('                   '),
     colors(Color,ColorString),
-    % print(ColorString),
-    % print('                   '),
     append_tile_to_factory(Factory_number,ColorString),    
     rest_n_color_c_to_bag(1,ColorString),
-    fill_that_factory(Factory_number,Count1).   
+    fill_that_factory(Factory_number,Count1).
 
-
-% primera seccion de la ronda  en donde se rellenan todas las factorias
-fill_factories(1):-!,
-    fill_that_factory(1,4).
-fill_factories(Factories_number):-
-    N1 is Factories_number-1,
-    fill_that_factory(Factories_number,4),
-    fill_factories(N1).
-
-
-%segunda seccion de la ronda en donde todos los jugadores juegan hasta que se acaben todas las fichas de las fabricas y del centro
-play_to_end_round():-.
-
-%tercera seccion de la ronda en donde se colocan los azulejos de las escaleras de los jugadores en sus mosaicos y se suman las puntuaciones
-end_of_round():-.
-
-% cuarta seccion de la ronda en donde se realiza la comprobacion de que se cumplan las condiciones de finalizacion del juego
-comprobate_end_game():-
-    .
-
-%desarrollo de una ronda 
-round(Players_number,Factories_number):-
-    % print("entro a round   "),
-    fill_factories(Factories_number).
-    % play_to_end_round(),
-    % end_of_round(),
-    % comprobate_end_game().
-
-
-
-% start_game(Players_number):-
-%     % append_colors(),
-%     % append_factories_per_player(),
-%     % create_bag(),
-%     % create_cementery(),
-%     % append_factories_per_player(),
-%     factories_per_player(Players_number,Factories_number),
-%     inicialize_game(Factories_number),
-%     % create_players(Players_number),
-%     %create_factories(Players_number),
-%     % print("voy a entrar a round    "),
-%     round(Players_number,Factories_number).
-%     % print("salgo de round    ").
