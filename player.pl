@@ -9,7 +9,7 @@
 % R4 -> Piso 4 de la escalera    _ _ _ _
 % R5 -> Piso 5 de la escalera  _ _ _ _ _
 % M -> Mosaico o Matriz de la derecha o Muro
-% D -> Fichas descartadas(Dropped Tiles)
+% D -> Cantidad de Fichas descartadas(Dropped Tiles)
 :- dynamic players/9, 
     first_player/1. % Jugador que comenzo jugando esta ronda(Tenia la ficha 1)
 
@@ -123,7 +123,9 @@ update_row(P, C, A, 5):-
 % R -> Row = 1
 % NewA -> En caso de poder actualizarse cual seria la nueva cantidad, de no poder actualizarse la cantidad seria 0
 can_set_tiles_in_row(P,C, A, 1, NewA):-
-    players(P, _, (C1,A1) = R1, _, _, _, _, _, _),
+    players(P, _, R1, _, _, _, _, _, _),
+    (C1,A1) = R1,
+    format("~a ~a ~n", [C1, A1]),
     C1 =:= C,
     A + A1 =< 1,
     NewA is A + A1.
@@ -140,9 +142,9 @@ can_set_tiles_in_row(P,C, A, 2, NewA):-
 % Row = 3
 can_set_tiles_in_row(P,C, A, 3, NewA):-
     players(P, _, _,_, (C1,A1) = R3,  _, _, _, _),
-    C1 =:= 0;
-    C1 =:= C,
-    A + A1 =< 1,
+    (C1 =:= 0;
+    C1 =:= C),
+    A + A1 =< 3,
     NewA is A + A1.
 % Lo mismo que el anterior, pero Row=4
 % Row = 4
@@ -226,6 +228,12 @@ update_matrix(P, M):-
 
 kk:-
     create_players(2),
+    can_set_tiles_in_row(1,2, 3, 1, NewA),
+    print(NewA).
+    % get_col("rojo", 1, X),
+    % print(X),
+    % valid_pos(1, 3).
+    % can_set_tiles_in_row(P,C, A, 3, NewA)
    % players(X,Y,(Z,W), R1,R2,R3,R4, W, B),
     %format("Fin del Turno. ~a ~a ~a ~a ~n",[X,Y,Z,W]),
     %cell_values([[0,0], [0,1], [1,0], [1,1]], [[6,4],[2,3]], V),
