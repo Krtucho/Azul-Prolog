@@ -150,8 +150,8 @@ can_set_tiles_in_row(P,C, A, 1, NewA):-
 % Lo mismo que el anterior, pero Row=2
 % Row = 2
 can_set_tiles_in_row(P,C, A, 2, NewA):-
-    players(P, _, R1, _, _, _, _, W, _),
-    (C1,A1) = R1,
+    players(P, _,  _, R2, _, _, _, W, _),
+    (C1,A1) = R2,
     set_dynamic_bool_false,
     not(color_in_row(C, 2, W, R)), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
@@ -159,34 +159,53 @@ can_set_tiles_in_row(P,C, A, 2, NewA):-
     C1 =:= C),
     % A + A1 =< 1,
     set_dynamic_bool_true,
-    A2 is 1 - A1,
+    A2 is 2 - A1,
     NewA is A - A2.
 
 % Lo mismo que el anterior, pero Row=3
 % Row = 3
 can_set_tiles_in_row(P,C, A, 3, NewA):-
-    players(P, _, _,_, (C1,A1) = R3,  _, _, _, _),
+    players(P, _, _,_,R3,  _, _, W, _),
+    (C1,A1) = R3,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 2, W, R)), % El color no se encuentra en la fila del Muro
+    format("~a ~a ~n", [C1, A1]),
     (C1 =:= 0;
     C1 =:= C),
-    A + A1 =< 3,
-    NewA is A + A1.
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 3 - A1,
+    NewA is A - A2.
+
 % Lo mismo que el anterior, pero Row=4
 % Row = 4
 can_set_tiles_in_row(P,C, A, 4, NewA):-
-    players(P, _, _,_,_, (C1,A1) = R4, _, _, _),
-    C1 =:= 0;
-    C1 =:= C,
-    A + A1 =< 1,
-    NewA is A + A1.
+    players(P, _, _,_,_, R4, _, _, _),
+    (C1,A1) = R4,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 2, W, R)), % El color no se encuentra en la fila del Muro
+    format("~a ~a ~n", [C1, A1]),
+    (C1 =:= 0;
+    C1 =:= C),
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 4 - A1,
+    NewA is A - A2.
 
 % Lo mismo que el anterior, pero Row=5
 % Row = 5
 can_set_tiles_in_row(P,C, A, 5, NewA):-
-    players(P, _, _,_,_, _, (C1,A1) = R5, _, _),
-    C1 =:= 0;
-    C1 =:= C,
-    A + A1 =< 1,
-    NewA is A + A1.
+    players(P, _, _,_,_, _, R5, _, _),
+    (C1,A1) = R5,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 2, W, R)), % El color no se encuentra en la fila del Muro
+    format("~a ~a ~n", [C1, A1]),
+    (C1 =:= 0;
+    C1 =:= C),
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 5 - A1,
+    NewA is A - A2.
 
 % Calcular la puntuacion a restar con n fichas descartadas.
 % N numero de fichas descartadas(se incluye la ficha de jugadr inicial)
