@@ -1,3 +1,16 @@
+    % WW      WW      WW              ll    ll                      ll  
+    % WW      WW      WW              ll    ll                      ll  
+    %   WW    WW      WW    aaaaaa    ll    ll          pppppppp    ll  
+    %   WW  WW  WW  WW    aa    aa    ll    ll          pp    pp    ll  
+    %   WW  WW  WW  WW          aa    ll    ll          pp    pp    ll  
+    %   WW  WW  WW  WW    aaaaaaaa    ll    ll          pp    pp    ll  
+    %   WW  WW  WW  WW    aa    aa    ll    ll          pp    pp    ll  
+    %     WW      WW      aa    aa    ll    ll          pp    pp    ll  
+    %     WW      WW      aaaaaaaa    llll  llll  ..    pppppppp    llll
+    %                                                   pp              
+    %                                                   pp              
+    %                                                   pp              
+
 :-[utils].
 
 % Obtiene la columna C de la loza de color T en la fila R del muro
@@ -49,6 +62,11 @@ valid_pos_to_insert_tile(R, C, M, V):-
     valid_pos(R,C),
     get_values([R,C], M, V),
     V =:= 0.
+
+color_in_row(T, R, W, Result):-
+    fail.
+    % find_col(T, R, C),
+    % Result is True.
 
 % Dada una matriz M inserta en la posicion (R,C) la loseta de color Tile
 % R -> Fila

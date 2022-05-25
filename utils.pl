@@ -1,3 +1,19 @@
+% Booleano dinamico que se le podra asignar 0 = False o 1 = True
+:-dynamic_bool/1.
+
+start_dynamic_bool:-
+    assert(dynamic_bool(1)).
+
+set_dynamic_bool_true:-
+    assert(dynamic_bool(_)),
+    retractall(dynamic_bool(_)),
+    assert(dynamic_bool(1)).
+    
+set_dynamic_bool_false:-
+    assert(dynamic_bool(_)),
+    retractall(dynamic_bool(_)),
+    assert(dynamic_bool(0)).
+
 concatList([], Z, Z).
 concatList([A|X], Y, [A|Z]) :- 
     concatList(X, Y, Z).

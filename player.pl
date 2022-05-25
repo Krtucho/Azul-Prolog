@@ -1,3 +1,14 @@
+    % PPPPPPPP    ll                                                        ll  
+    % PP    PP    ll                                                        ll  
+    % PP    PP    ll    aaaaaa  yy      yy  eeeeee    rrrrrr      pppppp    ll  
+    % PP    PP    ll    aa  aa    yy  yy    ee    ee  rr          pp    pp  ll  
+    % PPPPPPPP    ll    aaaaaa    yy  yy    eeeeeeee  rr          pp    pp  ll  
+    % PP          ll    aa  aa    yy  yy    ee        rr          pp    pp  ll  
+    % PP          ll    aa  aa      yy      ee        rr          pp    pp  ll  
+    % PP          llll  aaaaaa      yy      eeeeee    rr      ..  pppppp    llll
+    %                               yy                            pp            
+    %                             yy                              pp            
+
 :-[wall].
 
 % Predicado dinamico players con 9 argumentos, el 1ro sera el numero del jugador y el 2do la puntuacion del mismo
@@ -46,40 +57,40 @@ remove_players():-
 
 % Score
 % Asigna Una puntuacion a un jugador con indice Player
-set_score(Player, Score):-
-    retract(players(Player, _, R1, R2,R3,R4,R5, M, D)),
-    assert(players(Player, Score, R1, R2,R3,R4,R5, M, D)).
+set_score(P, Score):-
+    retract(players(P, _, R1, R2,R3,R4,R5, M, D)),
+    assert(players(P, Score, R1, R2,R3,R4,R5, M, D)).
 
 % Aumenta la puntuacion del jugador con indice Player
-add_score(Player, Score_to_Add):-
-    retract(players(Player, Score,R1, R2,R3,R4,R5, M, D)),
+add_score(P, Score_to_Add):-
+    retract(players(P, Score,R1, R2,R3,R4,R5, M, D)),
     S is Score+Score_to_Add,
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 1 de la escalera
 update_R1(P, R1):-
-    retract(players(Player, S, _, R2,R3,R4,R5, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, _, R2,R3,R4,R5, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 2 de la escalera
 update_R2(P, R2):-
-    retract(players(Player, S, R1, _,R3,R4,R5, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, R1, _,R3,R4,R5, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 3 de la escalera
 update_R3(P, R3):-
-    retract(players(Player, S, R1, R2, _,R4,R5, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, R1, R2, _,R4,R5, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 4 de la escalera
 update_R4(P, R4):-
-    retract(players(Player, S, R1, R2, R3,_,R5, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, R1, R2, R3,_,R5, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 5 de la escalera
 update_R5(P, R5):-
-    retract(players(Player, S, R1, R2, R3,R4,_, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, R1, R2, R3,R4,_, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 
 %assert(colors(1,'negro')),
@@ -91,7 +102,7 @@ update_R5(P, R5):-
 % Ubica las fichas(A=cantidad de fichas) de color C en el jugador P en la fila R
 % P -> Player
 % C -> Color
-% A -> Amount
+% A -> Amount = Cantidad
 % R -> Row = 1
 update_row(P, C, A, 1):-
     update_R1(P, (C,A)).
@@ -123,20 +134,33 @@ update_row(P, C, A, 5):-
 % R -> Row = 1
 % NewA -> En caso de poder actualizarse cual seria la nueva cantidad, de no poder actualizarse la cantidad seria 0
 can_set_tiles_in_row(P,C, A, 1, NewA):-
-    players(P, _, R1, _, _, _, _, _, _),
+    players(P, _, R1, _, _, _, _, W, _),
     (C1,A1) = R1,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 1, W, R)),
+    % not(R), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    C1 =:= C,
-    A + A1 =< 1,
-    NewA is A + A1.
+    (C1 =:= 0;
+    C1 =:= C),
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 1 - A1,
+    NewA is A - A2.
 
 % Lo mismo que el anterior, pero Row=2
 % Row = 2
 can_set_tiles_in_row(P,C, A, 2, NewA):-
-    players(P, _, _, (C1,A1) = R2, _, _, _, _, _),
-    C1 =:= C,
-    A + A1 =< 1,
-    NewA is A + A1.
+    players(P, _, R1, _, _, _, _, W, _),
+    (C1,A1) = R1,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 2, W, R)), % El color no se encuentra en la fila del Muro
+    format("~a ~a ~n", [C1, A1]),
+    (C1 =:= 0;
+    C1 =:= C),
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 1 - A1,
+    NewA is A - A2.
 
 % Lo mismo que el anterior, pero Row=3
 % Row = 3
@@ -228,8 +252,20 @@ update_matrix(P, M):-
 
 kk:-
     create_players(2),
-    can_set_tiles_in_row(1,2, 3, 1, NewA),
-    print(NewA).
+    start_dynamic_bool,
+    dynamic_bool(C),
+    print(C),
+    can_set_tiles_in_row(1,1, 1, 1, NewA),
+    print(NewA),
+    dynamic_bool(B),
+    print(B),
+
+    update_row(1,1,1,1),
+
+    can_set_tiles_in_row(1,1, 1, 1, NewB),
+    print(NewB),
+    dynamic_bool(B),
+    print(B).
     % get_col("rojo", 1, X),
     % print(X),
     % valid_pos(1, 3).
