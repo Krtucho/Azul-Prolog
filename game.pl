@@ -1,4 +1,4 @@
-[game_utils].
+:-[game_utils].
 
 
 inicialize_game(Factories_number):-
@@ -48,7 +48,7 @@ append_play(Factories_number,Color):-
 %indica si es el play destinado a almacenar el total de las jugadas
 not_total(N):- not(N=:=10).
 
-%de todas las jugadas posibles, el jugador escoge una random(o sea devuelve el numero de la fabrica y el color)
+%de todas las jugadas posibles, el jugador escoge una random (o sea devuelve el numero de la fabrica y el color)
 choose_play(Factory_number,Color):-    
     plays(10,'total',Total),
     % random(1,5,RandomColor),

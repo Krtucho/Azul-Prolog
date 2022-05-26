@@ -1,4 +1,5 @@
 :-[wall].
+:-[player].
 
 % Predicado dinamico players con 9 argumentos, el 1ro sera el numero del jugador y el 2do la puntuacion del mismo
 % N -> Numero del jugador

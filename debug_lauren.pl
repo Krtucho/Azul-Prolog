@@ -93,7 +93,10 @@ choose_play(Factory_number,Color):-
 
 %cuando se realiza una jugada se encarga de quitar esa jugada y enviar el resto de las fichas de esa fabrica al centro
 update_plays(Factory_number,Color):-
-    plays(Factories_num,Color,Count).
+    plays(Factories_num,Color,Count),
+    retract(plays(Factories_num,Color,Count)).
+%crear un metodo para enviar lo que esta en la fabirca seleccionada al centro(ver si se pueden usar los metodos ya creados)
+
 
 %se le pasa la lista para encontrar el elemento N
 search_pos_n_on_plays(0,Factory_number,Color,[(X,Y)|_]):-!,
@@ -110,6 +113,7 @@ search_pos_n_on_plays(N,Factory_number,Color,[(X,Y)|Factories]):-
 %el jugador actual toma el color Color de la fabrica Factories number y coloca los azulejos en su escalera
 play(Actual_Player,Factories_number,Color):-
     update_plays(Factories_number,Color).
+
 
 %comprueba si no quedan jugadas por tomar (plays) esta vacio
 end_round(End):-
@@ -259,16 +263,18 @@ fill_factories(Factories_number):-
 %segunda seccion de la ronda en donde todos los jugadores juegan hasta que se acaben todas las fichas de las fabricas y del centro
 %se le pasa 0 si se acabaron las jugadas posibles y por tanto se acabo la ronda y N>0 significa que no ha acabado
 %se le pasa el jugador actual 
+
 play_to_end_round(0,Actual_Player,Players_number):-!.
 play_to_end_round(N,Actual_Player,Players_number):-
     choose_play(Factories_number,Color),
-    update_plays(Factories_number,Color),
+    format("ha sido escogida la jugada (~a,~a) ~n",[Factories_number,Color]),
+    % update_plays(Factories_number,Color),
     play(Actual_Player,Factories_number,Color),
     Actual_Player1 is  Actual_Player+1,
     Actual_Player_mod is Actual_Player1 mod Players_number,
     Actual_Player_mod1 is Actual_Player_mod+1,
     end_round(End),
-    play_to_end_round(End,Actual_Player_mod1).
+    play_to_end_round(End,Actual_Player_mod1,Players_number).
 
 
 
@@ -283,13 +289,12 @@ play_to_end_round(N,Actual_Player,Players_number):-
 round(Players_number,Factories_number):-
     % print("entro a round   "),
     fill_factories(Factories_number),
-    create_plays(Factories_number).
+    create_plays(Factories_number),
     % assert(plays(10,'total',0)),
 
     %aqui buscar el primer jugador de esta ronda
 
-
-    %play_to_end_round(1,Actual_Player,Players_number).
+    play_to_end_round(1,Actual_Player,Players_number).
     % end_of_round(),
     % comprobate_end_game().
 

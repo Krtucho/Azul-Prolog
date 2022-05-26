@@ -1,5 +1,5 @@
 % [game_utils].
-[game].
+:-[game].
 
 
 % primera seccion de la ronda  en donde se rellenan todas las factorias
@@ -23,7 +23,7 @@ play_to_end_round(N,Actual_Player,Players_number):-
     Actual_Player_mod is Actual_Player1 mod Players_number,
     Actual_Player_mod1 is Actual_Player_mod+1,
     end_round(End),
-    play_to_end_round(End,Actual_Player_mod1).
+    play_to_end_round(End,Actual_Player_mod1,Players_number).
 
 
 
@@ -38,6 +38,7 @@ play_to_end_round(N,Actual_Player,Players_number):-
 round(Players_number,Factories_number):-
     % print("entro a round   "),
     fill_factories(Factories_number),
+    create_players(Players_number),
     create_plays(Factories_number).
     % assert(plays(10,'total',0)),
 

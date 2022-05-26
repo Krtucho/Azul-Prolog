@@ -73,6 +73,7 @@ calculate_row_score(R,C, M, S):-
 % C -> Columna
 % M -> Matriz
 % S -> Puntuacion
+
 calculate_column_score(R,C, M, S):-
 
 % Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontal(fila) y verticalmente(columna) desde esa casilla
@@ -81,3 +82,4 @@ calculate_column_score(R,C, M, S):-
 % M -> Matriz
 % S -> Puntuacion
 calculate_score(R,C, M):-
+    .
