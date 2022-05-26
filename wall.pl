@@ -17,6 +17,7 @@
 % T -> Type
 % R -> Row
 % C -> Column
+%           T    R  C
 find_col("rojo", 1, 3).
 find_col("rojo", 2, 4).
 find_col("rojo", 3, 5).
@@ -63,8 +64,14 @@ valid_pos_to_insert_tile(R, C, M, V):-
     get_values([R,C], M, V),
     V =:= 0.
 
+% Devuelve True si se encuentra el color T en la fila R de la matriz W
+% T -> Tile o Type o Color de la ficha
+% R -> Fila a buscar
+% W -> Matriz del jugador 
 color_in_row(T, R, W, Result):-
-    fail.
+    find_col(T, R, C),
+    get_values([R,C], W, V),
+    V =:= 1.
     % find_col(T, R, C),
     % Result is True.
 
