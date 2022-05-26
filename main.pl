@@ -1,52 +1,62 @@
+% [game_utils].
+[game].
 
 
-take_n([X|Y],0,X):-!.
-take_n([X|Y],N,R):-N>0, N1 is N-1, take_n(Y,N1,R).
-
-eliminate_n(0,[X|Y],Y):-!.
-eliminate_n(N,[X|Y],R):-N1 is N-1, eliminate_n(N1,Y,R).
-
-len_list([], 0):-!.
-len_list([X|L], R):- cantidad(L,F),R is F+1.
-
+% primera seccion de la ronda  en donde se rellenan todas las factorias
+fill_factories(1):-!,
+    fill_that_factory(1,4).
+fill_factories(Factories_number):-
+    N1 is Factories_number-1,
+    fill_that_factory(Factories_number,4),
+    fill_factories(N1).
 
 
-create_bag(Bag):-Bag=['negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'negro', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'azul', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'amarillo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'rojo', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco', 'blanco'].
+%segunda seccion de la ronda en donde todos los jugadores juegan hasta que se acaben todas las fichas de las fabricas y del centro
+%se le pasa 0 si se acabaron las jugadas posibles y por tanto se acabo la ronda y N>0 significa que no ha acabado
+%se le pasa el jugador actual 
+play_to_end_round(0,Actual_Player,Players_number):-!.
+play_to_end_round(N,Actual_Player,Players_number):-
+    choose_play(Factories_number,Color),
+    update_plays(Factories_number,Color),
+    play(Actual_Player,Factories_number,Color),
+    Actual_Player1 is  Actual_Player+1,
+    Actual_Player_mod is Actual_Player1 mod Players_number,
+    Actual_Player_mod1 is Actual_Player_mod+1,
+    end_round(End),
+    play_to_end_round(End,Actual_Player_mod1).
 
 
 
-create_players(Players_number,Players):-.
+%tercera seccion de la ronda en donde se colocan los azulejos de las escaleras de los jugadores en sus mosaicos y se suman las puntuaciones
+% end_of_round():-.
+
+% cuarta seccion de la ronda en donde se realiza la comprobacion de que se cumplan las condiciones de finalizacion del juego
+% comprobate_end_game():-
+%     .
+
+%desarrollo de una ronda 
+round(Players_number,Factories_number):-
+    % print("entro a round   "),
+    fill_factories(Factories_number),
+    create_plays(Factories_number).
+    % assert(plays(10,'total',0)),
+
+    %aqui buscar el primer jugador de esta ronda
 
 
-
-create_factories(2,Bag,Factories):-fill_the_factories(5,Bag,Factories).
-create_factories(3,Bag,Factories):-fill_the_factories(7,Bag,Factories).
-create_factories(4,Bag,Factories):-fill_the_factories(9,Bag,Factories).
-
-fill_that_factory(0,Actual_Factory):-!.
-fill_that_factory(Count,[X|Elements]):-
-    Count1=Count-1,
-    Len is len_list(X),
-    random(0,Len,Random),
-    take_n(Bag,Random,X),
-    eliminate_n(Random,Bag,Bag),
-    fill_that_factory(Count1,Elements).   
-
-
-fill_the_factories(0,Bag,Factories):-!.
-fill_the_factories(Number_of_Factories,Bag,[Actual_Factory|Factories]):-
-    fill_that_factory(0,Actual_Factory),
-    Number_of_Factories1=Number_of_Factories-1,
-    fill_the_factories(Number_of_Factories1,Bag,Factories).
+    %play_to_end_round(1,Actual_Player,Players_number).
+    % end_of_round(),
+    % comprobate_end_game().
 
 
 
 start_game(Players_number):-
-    create_bag(Bag),
-    create_players(Players_number,Players),
-    create_factories(Players_number,Bag,Factories),
-    start_round(Bag,Players,Factories).
+    factories_per_player(Players_number,Factories_number),
+    inicialize_game(Factories_number),
+    round(Players_number,Factories_number).
 
 
+start:-
+    start_game(2).
 
-
+start.

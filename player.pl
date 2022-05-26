@@ -32,7 +32,7 @@ update_first_player(P):-
 create_player(N):-
     assert(players(N, 0, (0,0), (0,0), (0,0), (0,0), (0,0), 
     [
-        [0,0,1,0,0],
+        [0,0,0,1,0],
         [0,0,0,0,0],
         [0,0,0,0,0],
         [0,0,0,0,0],
@@ -138,6 +138,8 @@ can_set_tiles_in_row(P,C, A, 1, NewA):-
     (C1,A1) = R1,
     set_dynamic_bool_false,
     not(color_in_row(C, 1, W, R)),
+    % print(R),
+    % R =:= 0,
     % not(R), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
     (C1 =:= 0;
@@ -146,6 +148,7 @@ can_set_tiles_in_row(P,C, A, 1, NewA):-
     set_dynamic_bool_true,
     A2 is 1 - A1,
     NewA is A - A2.
+can_set_tiles_in_row(P,C, A, 1, NewA).
 
 % Lo mismo que el anterior, pero Row=2
 % Row = 2
@@ -161,7 +164,7 @@ can_set_tiles_in_row(P,C, A, 2, NewA):-
     set_dynamic_bool_true,
     A2 is 2 - A1,
     NewA is A - A2.
-
+can_set_tiles_in_row(P,C, A, 2, NewA).
 % Lo mismo que el anterior, pero Row=3
 % Row = 3
 can_set_tiles_in_row(P,C, A, 3, NewA):-
@@ -176,7 +179,7 @@ can_set_tiles_in_row(P,C, A, 3, NewA):-
     set_dynamic_bool_true,
     A2 is 3 - A1, % A2 = Cantidad restante que se pueden ubicar en la fila R3
     NewA is A - A2.
-
+can_set_tiles_in_row(P,C, A, 3, NewA).
 % Lo mismo que el anterior, pero Row=4
 % Row = 4
 can_set_tiles_in_row(P,C, A, 4, NewA):-
@@ -191,6 +194,7 @@ can_set_tiles_in_row(P,C, A, 4, NewA):-
     set_dynamic_bool_true,
     A2 is 4 - A1,
     NewA is A - A2.
+can_set_tiles_in_row(P,C, A, 4, NewA).
 
 % Lo mismo que el anterior, pero Row=5
 % Row = 5
@@ -206,11 +210,12 @@ can_set_tiles_in_row(P,C, A, 5, NewA):-
     set_dynamic_bool_true,
     A2 is 5 - A1,
     NewA is A - A2.
+can_set_tiles_in_row(P,C, A, 5, NewA).
 
 % Calcular la puntuacion a restar con n fichas descartadas.
 % N numero de fichas descartadas(se incluye la ficha de jugadr inicial)
 % S valor en numeros negativos a descontar o 0 si N es 0
-get_negative_score(0, 0).
+get_negative_score(0,  0).
 get_negative_score(1, -1).
 get_negative_score(2, -2).
 get_negative_score(3, -4).
@@ -271,20 +276,25 @@ update_matrix(P, M):-
 
 kk:-
     create_players(2),
-    start_dynamic_bool,
-    dynamic_bool(C),
-    print(C),
-    can_set_tiles_in_row(1,1, 1, 1, NewA),
-    print(NewA),
-    dynamic_bool(B),
-    print(B),
+    players(1,_,_,_,_,_,_,M,_),
+    calculate_row_score(0,0,M, R),
+    print(R).
+    % players(1,_,_,_,_,_,_,_,_),
+    % players(4,_,_,_,_,_,_,_,_),
+    % start_dynamic_bool,
+    % dynamic_bool(C),
+    % print(C),
+    % can_set_tiles_in_row(1,1, 1, 1, NewA),
+    % print(NewA),
+    % dynamic_bool(B),
+    % print(B),
 
-    update_row(1,1,1,1),
+    % update_row(1,1,1,1),
 
-    can_set_tiles_in_row(1,1, 1, 1, NewB),
-    print(NewB),
-    dynamic_bool(B),
-    print(B).
+    % can_set_tiles_in_row(1,1, 1, 1, NewB),
+    % print(NewB),
+    % dynamic_bool(B),
+    % print(B).
     % get_col("rojo", 1, X),
     % print(X),
     % valid_pos(1, 3).

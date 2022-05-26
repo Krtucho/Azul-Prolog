@@ -11,42 +11,42 @@
     %                                                   pp              
     %                                                   pp              
 
-:-[utils].
+:-[utils, game_utils].
 
 % Obtiene la columna C de la loza de color T en la fila R del muro
 % T -> Type
 % R -> Row
 % C -> Column
 %           T    R  C
-find_col("rojo", 1, 3).
-find_col("rojo", 2, 4).
-find_col("rojo", 3, 5).
-find_col("rojo", 4, 1).
-find_col("rojo", 5, 2).
+find_col('rojo', 1, 3).
+find_col('rojo', 2, 4).
+find_col('rojo', 3, 5).
+find_col('rojo', 4, 1).
+find_col('rojo', 5, 2).
 
-find_col("negro", 1, 4).
-find_col("negro", 2, 5).
-find_col("negro", 3, 1).
-find_col("negro", 4, 2).
-find_col("negro", 5, 3).
+find_col('negro', 1, 4).
+find_col('negro', 2, 5).
+find_col('negro', 3, 1).
+find_col('negro', 4, 2).
+find_col('negro', 5, 3).
 
-find_col("amarillo", 1, 2).
-find_col("amarillo", 2, 3).
-find_col("amarillo", 3, 4).
-find_col("amarillo", 4, 5).
-find_col("amarillo", 5, 1).
+find_col('amarillo', 1, 2).
+find_col('amarillo', 2, 3).
+find_col('amarillo', 3, 4).
+find_col('amarillo', 4, 5).
+find_col('amarillo', 5, 1).
 
-find_col("azul", 1, 1).
-find_col("azul", 2, 2).
-find_col("azul", 3, 3).
-find_col("azul", 4, 4).
-find_col("azul", 5, 5).
+find_col('azul', 1, 1).
+find_col('azul', 2, 2).
+find_col('azul', 3, 3).
+find_col('azul', 4, 4).
+find_col('azul', 5, 5).
 
-find_col("blanco", 1, 5).
-find_col("blanco", 2, 1).
-find_col("blanco", 3, 2).
-find_col("blanco", 4, 3).
-find_col("blanco", 5, 4).
+find_col('blanco', 1, 5).
+find_col('blanco', 2, 1).
+find_col('blanco', 3, 2).
+find_col('blanco', 4, 3).
+find_col('blanco', 5, 4).
 
 % Posicion valida en una matriz (Determina si los valores se encuentran del rango de numeros validos en una matriz)
 valid_pos(R, C):-
@@ -60,18 +60,26 @@ valid_pos(R, C):-
 % M -> Matriz
 % V -> Valor ubicado en la posicion (R,C) de la matriz M
 valid_pos_to_insert_tile(R, C, M, V):-
+    set_dynamic_bool_false,
     valid_pos(R,C),
-    get_values([R,C], M, V),
-    V =:= 0.
+    get_values([[R,C]], M, [V]),
+    V =:= 0,
+    set_dynamic_bool_true.
 
+valid_pos_to_insert_tile(R, C, M, V).
 % Devuelve True si se encuentra el color T en la fila R de la matriz W
 % T -> Tile o Type o Color de la ficha
 % R -> Fila a buscar
 % W -> Matriz del jugador 
 color_in_row(T, R, W, Result):-
-    find_col(T, R, C),
-    get_values([R,C], W, V),
-    V =:= 1.
+    colors(T, T_str),
+    find_col(T_str, R, C),
+    R1 is R-1,
+    C1 is C-1,
+    get_values([[R1,C1]], W, [Result]),
+    % print(V),
+    Result =:= 1.
+    % Result = 1.
     % find_col(T, R, C),
     % Result is True.
 
@@ -81,7 +89,7 @@ color_in_row(T, R, W, Result):-
 % M -> Matriz
 % V -> Valor ubicado en la posicion (R,C) de la matriz M
 insert_tile(R, C, M, Tile):-
-    update_mat_rc(Mc,R,C,Tile,Mu).
+    update_mat_rc(M,R,C,Tile,Mu).
 
 % Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontalmente(fila) desde esa casilla 
 % R -> Fila
@@ -89,9 +97,16 @@ insert_tile(R, C, M, Tile):-
 % M -> Matriz
 % S -> Puntuacion
 calculate_row_score(R,C, M, S):-
-    RL is R + 1,
-    RR is R - 1,
-    not(valid_pos_to_insert_tile()).
+    CL is C + 1,
+    CR is C - 1,
+    (
+    not(valid_pos_to_insert_tile(CL, C, M, V)));
+    print(V)
+    ;% dynamic_bool(B),
+    print(B),
+    S1 is S + 1,
+    calculate_row_score(CL, C, M, S1).
+calculate_row_score(R, C, M, S).
 
 % Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos verticalmente(columna) desde esa casilla
 % R -> Fila
