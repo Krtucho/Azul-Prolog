@@ -334,8 +334,9 @@ calculate_columns_filled_amount_score(W, S):-
     !.
 
 diag_is_filled(Tile, W):-
-    colors(Tile, Tile_str)
-    findall(X, find_col(Tile_str, ))
+    colors(Tile, Tile_str),
+    findall((R,C), find_col(Tile_str, R, C), L),
+    print(L).
 
 calculate_row_col_diag_filled_score(W, S):-
     calculate_rows_filled_amount_score(W, S1),

@@ -282,8 +282,9 @@ kk:-
     % calculate_row_score(0,1,M, R),
     % print(R).
     % row_is_filled(0, M).
-    calculate_rows_filled_amount_score(M, S),
-    print(S).
+    % calculate_rows_filled_amount_score(M, S),
+    diag_is_filled(1, M).
+    % print(S).
     % players(1,_,_,_,_,_,_,_,_),
     % players(4,_,_,_,_,_,_,_,_),
     % start_dynamic_bool,
