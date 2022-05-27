@@ -11,7 +11,21 @@
     %                                                   pp              
     %                                                   pp              
 
-:-[utils, game_utils].
+:-[utils,       % Importando
+                % -dynamic_bool/1.
+                % -start_dynamic_bool
+                % -set_dynamic_bool_true
+                % -set_dynamic_bool_false
+                % -concatList([], Z, Z).
+                % -concatList([A|X], Y, [A|Z]).
+                % -get_values([], _, [])
+                % -get_values([[R, C]| T], M, [V|VT])
+                % -update_mat_rc(Mc,R,C,V,Mu)
+game_utils].  
+                       
+
+:-dynamic temp_score/1. % Variable dinamica que guarda la puntuacion actual de un jugador que agrega fichas al muro que se esta calculando
+
 
 % Obtiene la columna C de la loza de color T en la fila R del muro
 % T -> Type
@@ -54,10 +68,25 @@ valid_pos(R, C):-
     R =< 4,
     C >= 0,
     C =< 4.
+
+% Pone X al valor del predicado temp_score
+% Esto ayuda mucho a la hora de contar la puntuacion que gana el jugador al pasar un azulejo hacia el muro 
+set_temp_score(X):-
+    assert(temp_score(_)),
+    retractall(temp_score(_)),
+    assert(temp_score(X)).
+
+% Elimina el ultimo valor que tenia el predicado temp_score y le pone el valor 1
+clean_temp_score:-
+    retractall(temp_score(_)),
+    set_temp_score(1).
+
 % Dada una matriz M nos dice si la casilla (R,C) de la misma esta vacia y si es posible insertar alguna losa de algun color
 % R -> Fila
 % C -> Columna
 % M -> Matriz
+% Return
+% !!! Uso del predicado dinamico dynamic_bool para saber si es posible insertar la ficha o no
 % V -> Valor ubicado en la posicion (R,C) de la matriz M
 valid_pos_to_insert_tile(R, C, M, V):-
     set_dynamic_bool_false,
@@ -71,17 +100,15 @@ valid_pos_to_insert_tile(R, C, M, V).
 % T -> Tile o Type o Color de la ficha
 % R -> Fila a buscar
 % W -> Matriz del jugador 
+% Return
+% Result, contiene el valor de la posicion 
 color_in_row(T, R, W, Result):-
     colors(T, T_str),
     find_col(T_str, R, C),
     R1 is R-1,
     C1 is C-1,
     get_values([[R1,C1]], W, [Result]),
-    % print(V),
     Result =:= 1.
-    % Result = 1.
-    % find_col(T, R, C),
-    % Result is True.
 
 % Dada una matriz M inserta en la posicion (R,C) la loseta de color Tile
 % R -> Fila
@@ -91,33 +118,145 @@ color_in_row(T, R, W, Result):-
 insert_tile(R, C, M, Tile):-
     update_mat_rc(M,R,C,Tile,Mu).
 
-% Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontalmente(fila) desde esa casilla 
+%################################################# Calculando puntuaciones ############################################
+
+% Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontalmente(fila) desde esa casilla
+% moviendonos hacia la izquierda
+% R -> Fila
+% C -> Columna
+% M -> Matriz
+% Return:
+% Void
+calculate_row_score_left(R, C, M):-
+    CL is C - 1,    % Actualizamos el indice de la columna que se movera a la izqda(ColumnLeft)
+
+    CL >= 0,        % Comparamos que se encuentre dentro de los limites de la matriz
+    CL =< 4,
+    get_values([[R,CL]], M, [V]),   % Buscando el valor de la casilla acutal de la matriz, asignamos el mismo a la variable V
+    V =:= 1,                % Comprobamos que el valor de la casilla en la que estamos situados actualmente tenga 1(contiene una loza en la misma)
+
+    retract(temp_score(B)), %    
+    B1 is B+1,              % Actualizamos el valor de la cantidad de casillas contiguas que tenian alguna loza colocada
+    assert(temp_score(B1)), %
+    
+    calculate_row_score_left(R, CL, M).
+% Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
+calculate_row_score_left(R, C, M).
+% Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontalmente(fila) desde esa casilla
+% moviendonos hacia la derecha
 % R -> Fila
 % C -> Columna
 % M -> Matriz
 % S -> Puntuacion
-calculate_row_score(R,C, M, S):-
-    CL is C + 1,
-    CR is C - 1,
-    (
-    not(valid_pos_to_insert_tile(CL, C, M, V)));
-    print(V)
-    ;% dynamic_bool(B),
-    print(B),
-    S1 is S + 1,
-    calculate_row_score(CL, C, M, S1).
+% Return:
+% Void
+calculate_row_score_right(R,C, M):-
+
+    CR is C + 1,
+    CR >= 0,
+    CR =< 4,
+    get_values([[R,CR]], M, [V]),
+    V =:= 1,
+
+    retract(temp_score(B)),
+    B1 is B+1,
+    assert(temp_score(B1)),
+    
+    calculate_row_score_right(R, CR, M).
+% Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
+calculate_row_score_right(R,C, M).
+
+% Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontalmente(fila) desde esa casilla
+% moviendonos hacia ambos ladods(Izquierda y derecha)
+% Args:
+% R -> Fila
+% C -> Columna
+% M -> Matriz
+% Return:
+% Void
+calculate_row_score(R,C, M):-
+    calculate_row_score_left(R, C, M),
+    calculate_row_score_right(R, C, M),
+    !.
+% Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
 calculate_row_score(R, C, M, S).
 
 % Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos verticalmente(columna) desde esa casilla
+% moviendonos hacia arriba
 % R -> Fila
 % C -> Columna
 % M -> Matriz
-% S -> Puntuacion
-calculate_column_score(R,C, M, S).
+% Return:
+% Void
+calculate_column_score_up(R,C, M):-
+    RU is R - 1,    % Actualizamos el indice de la fila que se movera hacia arriba(RowUp)
+
+    RU >= 0,        % Comparamos que se encuentre dentro de los limites de la matriz
+    RU =< 4,
+    get_values([[R,RU]], M, [V]),   % Buscando el valor de la casilla acutal de la matriz, asignamos el mismo a la variable V
+    V =:= 1,                % Comprobamos que el valor de la casilla en la que estamos situados actualmente tenga 1(contiene una loza en la misma)
+
+    retract(temp_score(B)), %    
+    B1 is B+1,              % Actualizamos el valor de la cantidad de casillas contiguas que tenian alguna loza colocada
+    assert(temp_score(B1)), %
+
+    calculate_column_score_up(RU,C, M).
+% Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
+calculate_column_score_up(R,C, M).
+
+% Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos verticalmente(columna) desde esa casilla
+% moviendonos hacia abajo
+% R -> Fila
+% C -> Columna
+% M -> Matriz
+% Return:
+% Void
+calculate_column_score_down(R,C, M):-
+    RD is R - 1,    % Actualizamos el indice de la fila que se movera hacia abajo(RowDown)
+
+    RD >= 0,        % Comparamos que se encuentre dentro de los limites de la matriz
+    RD =< 4,
+    get_values([[R,RD]], M, [V]),   % Buscando el valor de la casilla acutal de la matriz, asignamos el mismo a la variable V
+    V =:= 1,                % Comprobamos que el valor de la casilla en la que estamos situados actualmente tenga 1(contiene una loza en la misma)
+
+    retract(temp_score(B)), %    
+    B1 is B+1,              % Actualizamos el valor de la cantidad de casillas contiguas que tenian alguna loza colocada
+    assert(temp_score(B1)), %
+
+    calculate_column_score_down(RD,C, M).
+% Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
+calculate_column_score_down(R,C, M).
+
+% Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos verticalmente(columna) desde esa casilla
+% Args:
+% R -> Fila
+% C -> Columna
+% M -> Matriz
+% Return:
+% Void
+calculate_column_score(R,C, M):-
+    calculate_column_score_up(R, C, M),
+    calculate_column_score_down(R, C, M),
+    !.
+% Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
+calculate_column_score(R, C, M).
 
 % Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontal(fila) y verticalmente(columna) desde esa casilla
 % R -> Fila
 % C -> Columna
 % M -> Matriz
 % S -> Puntuacion
-calculate_score(R,C, M).
+calculate_score(R,C, M, S):-
+    set_temp_score(1),
+    calculate_row_score(R, C, M),
+    calculate_column_score(R,C, M),
+    temp_score(S),
+    !.
+
+%################################################# Calculando puntuaciones ############################################
+
+%################################################# Comprobando Filas, columnas y diagonales ############################################
+
+
+
+%################################################# Comprobando Filas, columnas y diagonales ############################################

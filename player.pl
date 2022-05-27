@@ -32,7 +32,7 @@ update_first_player(P):-
 create_player(N):-
     assert(players(N, 0, (0,0), (0,0), (0,0), (0,0), (0,0), 
     [
-        [0,0,0,1,0],
+        [1,1,1,1,1],
         [0,0,0,0,0],
         [0,0,0,0,0],
         [0,0,0,0,0],
@@ -277,7 +277,8 @@ update_matrix(P, M):-
 kk:-
     create_players(2),
     players(1,_,_,_,_,_,_,M,_),
-    calculate_row_score(0,0,M, R),
+    set_temp_score,
+    calculate_row_score(0,1,M, R),
     print(R).
     % players(1,_,_,_,_,_,_,_,_),
     % players(4,_,_,_,_,_,_,_,_),
@@ -311,5 +312,4 @@ kk:-
 
     %nth0(2, Z, O),
     %print(O).
-
 kk.
