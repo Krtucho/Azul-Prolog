@@ -64,7 +64,7 @@ update_mat_rc(Mc,R,C,V,Mu) :-
 % Matrix(Matriz o lista en la que vamos a buscar)
 % Fila resultante
 get_row(Index, Matrix, Row):-
-    nth0(Row, Matrix, Row).
+    nth0(Index, Matrix, Row).
 
 %?- get_col( [[1,2], [3, 4], [5,6]], 0, Col).
 %Col = [1, 3, 5].

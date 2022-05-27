@@ -25,6 +25,7 @@
     first_player/1. % Jugador que comenzo jugando esta ronda(Tenia la ficha 1)
 
 update_first_player(P):-
+    assert(first_player(_)),
     retractall(first_player(_)),
     assert(first_player(P)).
 
@@ -277,9 +278,12 @@ update_matrix(P, M):-
 kk:-
     create_players(2),
     players(1,_,_,_,_,_,_,M,_),
-    set_temp_score,
-    calculate_row_score(0,1,M, R),
-    print(R).
+    % set_temp_score,
+    % calculate_row_score(0,1,M, R),
+    % print(R).
+    % row_is_filled(0, M).
+    calculate_rows_filled_amount_score(M, S),
+    print(S).
     % players(1,_,_,_,_,_,_,_,_),
     % players(4,_,_,_,_,_,_,_,_),
     % start_dynamic_bool,

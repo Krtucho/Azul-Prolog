@@ -257,6 +257,88 @@ calculate_score(R,C, M, S):-
 
 %################################################# Comprobando Filas, columnas y diagonales ############################################
 
+dif_0(X):-
+    X =\= 0.
+
+cumplen_todos([],_).
+cumplen_todos([X|Y],C):- T=..[C,X], T, cumplen_todos(Y,C).
 
 
+row_is_filled(R, W):-
+    % colors(T, T_str),
+    set_dynamic_bool_false,
+    get_row(R, W, Full_Row),
+    print(Full_Row),
+    % findall(X, nth0(T, Full_Row, X), V),
+    cumplen_todos(Full_Row, dif_0),
+    set_dynamic_bool_true.
+row_is_filled(R,W).
+
+
+update_temp_score_using_dynamic_bool:-
+    dynamic_bool(Bool),
+    Bool =:= 1,
+    retract(temp_score(B)), %    
+    B1 is B+1,              % Actualizamos el valor de la cantidad de casillas contiguas que tenian alguna loza colocada
+    assert(temp_score(B1)). %
+update_temp_score_using_dynamic_bool.
+
+calculate_rows_filled_amount_score(W, S):-
+    set_temp_score(0),
+    % Row 0
+    row_is_filled(0, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 1
+    row_is_filled(1, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 2
+    row_is_filled(2, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 3
+    row_is_filled(3, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 4
+    row_is_filled(4, W),
+    update_temp_score_using_dynamic_bool,
+    temp_score(S),
+    !.
+
+col_is_filled(R, W):-
+    % colors(T, T_str),
+    set_dynamic_bool_false,
+    get_row(R, W, Full_Row),
+    print(Full_Row),
+    % findall(X, nth0(T, Full_Row, X), V),
+    cumplen_todos(Full_Row, dif_0),
+    set_dynamic_bool_true.
+col_is_filled(R,W).
+
+calculate_columns_filled_amount_score(W, S):-
+    set_temp_score(0),
+    % Row 0
+    col_is_filled(0, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 1
+    col_is_filled(1, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 2
+    col_is_filled(2, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 3
+    col_is_filled(3, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 4
+    col_is_filled(4, W),
+    update_temp_score_using_dynamic_bool,
+    temp_score(S),
+    !.
+
+diag_is_filled(Tile, W):-
+    colors(Tile, Tile_str)
+    findall(X, find_col(Tile_str, ))
+
+calculate_row_col_diag_filled_score(W, S):-
+    calculate_rows_filled_amount_score(W, S1),
+    calculate_columns_filled_amount_score(W, S2),
+    S is S1 + S2.
 %################################################# Comprobando Filas, columnas y diagonales ############################################
