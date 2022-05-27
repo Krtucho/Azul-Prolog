@@ -32,35 +32,35 @@ game_utils].
 % R -> Row
 % C -> Column
 %           T    R  C
+find_col('rojo', 0, 2).
 find_col('rojo', 1, 3).
 find_col('rojo', 2, 4).
-find_col('rojo', 3, 5).
+find_col('rojo', 3, 0).
 find_col('rojo', 4, 1).
-find_col('rojo', 5, 2).
 
+find_col('negro', 0, 3).
 find_col('negro', 1, 4).
-find_col('negro', 2, 5).
+find_col('negro', 2, 0).
 find_col('negro', 3, 1).
 find_col('negro', 4, 2).
-find_col('negro', 5, 3).
 
+find_col('amarillo', 0, 1).
 find_col('amarillo', 1, 2).
 find_col('amarillo', 2, 3).
 find_col('amarillo', 3, 4).
-find_col('amarillo', 4, 5).
-find_col('amarillo', 5, 1).
+find_col('amarillo', 4, 0).
 
+find_col('azul', 0, 0).
 find_col('azul', 1, 1).
 find_col('azul', 2, 2).
 find_col('azul', 3, 3).
 find_col('azul', 4, 4).
-find_col('azul', 5, 5).
 
-find_col('blanco', 1, 5).
+find_col('blanco', 0, 4).
+find_col('blanco', 1, 0).
 find_col('blanco', 2, 1).
 find_col('blanco', 3, 2).
 find_col('blanco', 4, 3).
-find_col('blanco', 5, 4).
 
 % Posicion valida en una matriz (Determina si los valores se encuentran del rango de numeros validos en una matriz)
 valid_pos(R, C):-
@@ -105,9 +105,9 @@ valid_pos_to_insert_tile(R, C, M, V).
 color_in_row(T, R, W, Result):-
     colors(T, T_str),
     find_col(T_str, R, C),
-    R1 is R-1,
-    C1 is C-1,
-    get_values([[R1,C1]], W, [Result]),
+    % R1 is R-1,
+    % C1 is C-1,
+    get_values([[R,C]], W, [Result]),
     Result =:= 1.
 
 % Dada una matriz M inserta en la posicion (R,C) la loseta de color Tile
@@ -333,13 +333,44 @@ calculate_columns_filled_amount_score(W, S):-
     temp_score(S),
     !.
 
+% dif_0_n_numbers((R,C)):-
+%     get_values([[R,C]], W)
+
 diag_is_filled(Tile, W):-
+    set_dynamic_bool_false,
     colors(Tile, Tile_str),
-    findall((R,C), find_col(Tile_str, R, C), L),
-    print(L).
+    findall([R,C], find_col(Tile_str, R, C), L),
+    % print(L),
+    get_values(L, W, Full_Row),
+    % print(Full_Row),
+
+    cumplen_todos(Full_Row, dif_0),
+    set_dynamic_bool_true.
+diag_is_filled(Tile, W).
+
+calculate_colors_filled_amount_score(W, S):-
+    set_temp_score(0),
+    % Row 0
+    diag_is_filled(0, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 1
+    diag_is_filled(1, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 2
+    diag_is_filled(2, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 3
+    diag_is_filled(3, W),
+    update_temp_score_using_dynamic_bool,
+    % Row 4
+    diag_is_filled(4, W),
+    update_temp_score_using_dynamic_bool,
+    temp_score(S),
+    !.
 
 calculate_row_col_diag_filled_score(W, S):-
     calculate_rows_filled_amount_score(W, S1),
     calculate_columns_filled_amount_score(W, S2),
-    S is S1 + S2.
+    calculate_colors_filled_amount_score(W, S3),
+    S is S1 + S2 + S3.
 %################################################# Comprobando Filas, columnas y diagonales ############################################
