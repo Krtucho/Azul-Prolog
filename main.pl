@@ -1,6 +1,6 @@
 % [game_utils].
 :-[game].
-
+:-[player].
 
 % primera seccion de la ronda  en donde se rellenan todas las factorias
 fill_factories(1):-!,
@@ -17,7 +17,7 @@ fill_factories(Factories_number):-
 play_to_end_round(0,Actual_Player,Players_number):-!.
 play_to_end_round(N,Actual_Player,Players_number):-
     choose_play(Factories_number,Color),
-    update_plays(Factories_number,Color),
+    % update_plays(Factories_number,Color),
     play(Actual_Player,Factories_number,Color),
     Actual_Player1 is  Actual_Player+1,
     Actual_Player_mod is Actual_Player1 mod Players_number,
@@ -40,12 +40,11 @@ round(Players_number,Factories_number):-
     fill_factories(Factories_number),
     create_players(Players_number),
     create_plays(Factories_number).
+    % % create_discard(Players_number),
     % assert(plays(10,'total',0)),
 
     %aqui buscar el primer jugador de esta ronda
-
-
-    %play_to_end_round(1,Actual_Player,Players_number).
+    % play_to_end_round(1,Actual_Player,Players_number).
     % end_of_round(),
     % comprobate_end_game().
 

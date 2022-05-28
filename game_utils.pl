@@ -8,6 +8,13 @@
 :-dynamic center/2.
 %predicado de jugadas que tiene el numero de la fabrica, el color y la cantidad de fichas de ese color, la fabrica 0 representa el centro
 :-dynamic plays/3.
+%se utiliza para guardar la mejor jugada que puede hacer un jugador en su turno, en este caso seria el primer argumento el jugador, en el segundo la fila
+%en que se pondrian los azulejos previamente seleccionados como tercero la cantidad de azulejos que se descartan y 
+%por ultimo el valor que tendria esta jugada
+:-dynamic better_play_player/4.
+% % %descarte a donde van las fichas que los jugadores no pueden poner en la escalera durante cada turno 
+% % :-dynamic discard_player/2.
+
 
 % :-dynamic factories_per_player/2.
 % :-dynamic colors/2.

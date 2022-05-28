@@ -1,5 +1,15 @@
+    % PPPPPPPP    ll                                                        ll  
+    % PP    PP    ll                                                        ll  
+    % PP    PP    ll    aaaaaa  yy      yy  eeeeee    rrrrrr      pppppp    ll  
+    % PP    PP    ll    aa  aa    yy  yy    ee    ee  rr          pp    pp  ll  
+    % PPPPPPPP    ll    aaaaaa    yy  yy    eeeeeeee  rr          pp    pp  ll  
+    % PP          ll    aa  aa    yy  yy    ee        rr          pp    pp  ll  
+    % PP          ll    aa  aa      yy      ee        rr          pp    pp  ll  
+    % PP          llll  aaaaaa      yy      eeeeee    rr      ..  pppppp    llll
+    %                               yy                            pp            
+    %                             yy                              pp            
+
 :-[wall].
-:-[player].
 
 % Predicado dinamico players con 9 argumentos, el 1ro sera el numero del jugador y el 2do la puntuacion del mismo
 % N -> Numero del jugador
@@ -10,7 +20,7 @@
 % R4 -> Piso 4 de la escalera    _ _ _ _
 % R5 -> Piso 5 de la escalera  _ _ _ _ _
 % M -> Mosaico o Matriz de la derecha o Muro
-% D -> Fichas descartadas(Dropped Tiles)
+% D -> Cantidad de Fichas descartadas(Dropped Tiles)
 :- dynamic players/9, 
     first_player/1. % Jugador que comenzo jugando esta ronda(Tenia la ficha 1)
 
@@ -22,7 +32,7 @@ update_first_player(P):-
 create_player(N):-
     assert(players(N, 0, (0,0), (0,0), (0,0), (0,0), (0,0), 
     [
-        [0,0,0,0,0],
+        [0,0,0,1,0],
         [0,0,0,0,0],
         [0,0,0,0,0],
         [0,0,0,0,0],
@@ -47,40 +57,40 @@ remove_players():-
 
 % Score
 % Asigna Una puntuacion a un jugador con indice Player
-set_score(Player, Score):-
-    retract(players(Player, _, R1, R2,R3,R4,R5, M, D)),
-    assert(players(Player, Score, R1, R2,R3,R4,R5, M, D)).
+set_score(P, Score):-
+    retract(players(P, _, R1, R2,R3,R4,R5, M, D)),
+    assert(players(P, Score, R1, R2,R3,R4,R5, M, D)).
 
 % Aumenta la puntuacion del jugador con indice Player
-add_score(Player, Score_to_Add):-
-    retract(players(Player, Score,R1, R2,R3,R4,R5, M, D)),
+add_score(P, Score_to_Add):-
+    retract(players(P, Score,R1, R2,R3,R4,R5, M, D)),
     S is Score+Score_to_Add,
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 1 de la escalera
 update_R1(P, R1):-
-    retract(players(Player, S, _, R2,R3,R4,R5, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, _, R2,R3,R4,R5, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 2 de la escalera
 update_R2(P, R2):-
-    retract(players(Player, S, R1, _,R3,R4,R5, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, R1, _,R3,R4,R5, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 3 de la escalera
 update_R3(P, R3):-
-    retract(players(Player, S, R1, R2, _,R4,R5, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, R1, R2, _,R4,R5, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 4 de la escalera
 update_R4(P, R4):-
-    retract(players(Player, S, R1, R2, R3,_,R5, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, R1, R2, R3,_,R5, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 % Actualizar Piso 5 de la escalera
 update_R5(P, R5):-
-    retract(players(Player, S, R1, R2, R3,R4,_, M, D)),
-    assert(players(Player, S, R1, R2,R3,R4,R5, M, D)).
+    retract(players(P, S, R1, R2, R3,R4,_, M, D)),
+    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
 
 
 %assert(colors(1,'negro')),
@@ -92,7 +102,7 @@ update_R5(P, R5):-
 % Ubica las fichas(A=cantidad de fichas) de color C en el jugador P en la fila R
 % P -> Player
 % C -> Color
-% A -> Amount
+% A -> Amount = Cantidad
 % R -> Row = 1
 update_row(P, C, A, 1):-
     update_R1(P, (C,A)).
@@ -124,49 +134,88 @@ update_row(P, C, A, 5):-
 % R -> Row = 1
 % NewA -> En caso de poder actualizarse cual seria la nueva cantidad, de no poder actualizarse la cantidad seria 0
 can_set_tiles_in_row(P,C, A, 1, NewA):-
-    players(P, _, (C1,A1) = R1, _, _, _, _, _, _),
-    C1 =:= C,
-    A + A1 =< 1,
-    NewA is A + A1.
+    players(P, _, R1, _, _, _, _, W, _),
+    (C1,A1) = R1,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 1, W, R)),
+    % print(R),
+    % R =:= 0,
+    % not(R), % El color no se encuentra en la fila del Muro
+    format("~a ~a ~n", [C1, A1]),
+    (C1 =:= 0;
+    C1 =:= C),
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 1 - A1,
+    NewA is A - A2.
+can_set_tiles_in_row(P,C, A, 1, NewA).
 
 % Lo mismo que el anterior, pero Row=2
 % Row = 2
 can_set_tiles_in_row(P,C, A, 2, NewA):-
-    players(P, _, _, (C1,A1) = R2, _, _, _, _, _),
-    C1 =:= C,
-    A + A1 =< 1,
-    NewA is A + A1.
-
+    players(P, _,  _, R2, _, _, _, W, _),
+    (C1,A1) = R2,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 2, W, R)), % El color no se encuentra en la fila del Muro
+    format("~a ~a ~n", [C1, A1]),
+    (C1 =:= 0;
+    C1 =:= C),
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 2 - A1,
+    NewA is A - A2.
+can_set_tiles_in_row(P,C, A, 2, NewA).
 % Lo mismo que el anterior, pero Row=3
 % Row = 3
 can_set_tiles_in_row(P,C, A, 3, NewA):-
-    players(P, _, _,_, (C1,A1) = R3,  _, _, _, _),
-    C1 =:= 0;
-    C1 =:= C,
-    A + A1 =< 1,
-    NewA is A + A1.
+    players(P, _, _,_,R3,  _, _, W, _),
+    (C1,A1) = R3,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 3, W, R)), % El color no se encuentra en la fila del Muro
+    format("~a ~a ~n", [C1, A1]),
+    (C1 =:= 0;
+    C1 =:= C),
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 3 - A1, % A2 = Cantidad restante que se pueden ubicar en la fila R3
+    NewA is A - A2.
+can_set_tiles_in_row(P,C, A, 3, NewA).
 % Lo mismo que el anterior, pero Row=4
 % Row = 4
 can_set_tiles_in_row(P,C, A, 4, NewA):-
-    players(P, _, _,_,_, (C1,A1) = R4, _, _, _),
-    C1 =:= 0;
-    C1 =:= C,
-    A + A1 =< 1,
-    NewA is A + A1.
+    players(P, _, _,_,_, R4, _, _, _),
+    (C1,A1) = R4,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 4, W, R)), % El color no se encuentra en la fila del Muro
+    format("~a ~a ~n", [C1, A1]),
+    (C1 =:= 0;
+    C1 =:= C),
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 4 - A1,
+    NewA is A - A2.
+can_set_tiles_in_row(P,C, A, 4, NewA).
 
 % Lo mismo que el anterior, pero Row=5
 % Row = 5
 can_set_tiles_in_row(P,C, A, 5, NewA):-
-    players(P, _, _,_,_, _, (C1,A1) = R5, _, _),
-    C1 =:= 0;
-    C1 =:= C,
-    A + A1 =< 1,
-    NewA is A + A1.
+    players(P, _, _,_,_, _, R5, _, _),
+    (C1,A1) = R5,
+    set_dynamic_bool_false,
+    not(color_in_row(C, 5, W, R)), % El color no se encuentra en la fila del Muro
+    format("~a ~a ~n", [C1, A1]),
+    (C1 =:= 0;
+    C1 =:= C),
+    % A + A1 =< 1,
+    set_dynamic_bool_true,
+    A2 is 5 - A1,
+    NewA is A - A2.
+can_set_tiles_in_row(P,C, A, 5, NewA).
 
 % Calcular la puntuacion a restar con n fichas descartadas.
 % N numero de fichas descartadas(se incluye la ficha de jugadr inicial)
 % S valor en numeros negativos a descontar o 0 si N es 0
-get_negative_score(0, 0).
+get_negative_score(0,  0).
 get_negative_score(1, -1).
 get_negative_score(2, -2).
 get_negative_score(3, -4).
@@ -227,6 +276,29 @@ update_matrix(P, M):-
 
 kk:-
     create_players(2),
+    players(1,_,_,_,_,_,_,M,_),
+    calculate_row_score(0,0,M, R),
+    print(R).
+    % players(1,_,_,_,_,_,_,_,_),
+    % players(4,_,_,_,_,_,_,_,_),
+    % start_dynamic_bool,
+    % dynamic_bool(C),
+    % print(C),
+    % can_set_tiles_in_row(1,1, 1, 1, NewA),
+    % print(NewA),
+    % dynamic_bool(B),
+    % print(B),
+
+    % update_row(1,1,1,1),
+
+    % can_set_tiles_in_row(1,1, 1, 1, NewB),
+    % print(NewB),
+    % dynamic_bool(B),
+    % print(B).
+    % get_col("rojo", 1, X),
+    % print(X),
+    % valid_pos(1, 3).
+    % can_set_tiles_in_row(P,C, A, 3, NewA)
    % players(X,Y,(Z,W), R1,R2,R3,R4, W, B),
     %format("Fin del Turno. ~a ~a ~a ~a ~n",[X,Y,Z,W]),
     %cell_values([[0,0], [0,1], [1,0], [1,1]], [[6,4],[2,3]], V),

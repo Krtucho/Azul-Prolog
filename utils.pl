@@ -1,3 +1,34 @@
+%                         ii    ll                                        ll    
+%                 tt            ll                                        ll    
+%                 tt            ll                                        ll    
+%   uu      uu  tttttttt  ii    ll      ssssssss            pp  pppppp    ll    
+%   uu      uu    tt      ii    ll      ss    ssss          pppp    pp    ll    
+%   uu      uu    tt      ii    ll      ss                  pp      pp    ll    
+%   uu      uu    tt      ii    ll      ssssss              pp      pp    ll    
+%   uu      uu    tt      ii    ll            ssss          pp      pp    ll    
+%   uu      uu    tt      ii    ll              ss          pp      pp    ll    
+%   uu      uu    tt      ii    ll    ssss      ss          pp      pp    ll    
+%     uuuuuuuu      tttt  ii    llllll  ssssssss      ..    pppppppp      llllll
+%                                                     ..    pp                  
+%                                                           pp                  
+%                                                           pp                  
+
+% Booleano dinamico que se le podra asignar 0 = False o 1 = True
+:-dynamic_bool/1.
+
+start_dynamic_bool:-
+    assert(dynamic_bool(1)).
+
+set_dynamic_bool_true:-
+    assert(dynamic_bool(_)),
+    retractall(dynamic_bool(_)),
+    assert(dynamic_bool(1)).
+    
+set_dynamic_bool_false:-
+    assert(dynamic_bool(_)),
+    retractall(dynamic_bool(_)),
+    assert(dynamic_bool(0)).
+
 concatList([], Z, Z).
 concatList([A|X], Y, [A|Z]) :- 
     concatList(X, Y, Z).
