@@ -14,7 +14,7 @@
 :-dynamic better_play_player/4.
 % % %descarte a donde van las fichas que los jugadores no pueden poner en la escalera durante cada turno 
 % % :-dynamic discard_player/2.
-
+:-dynamic first_player/1.
 
 % :-dynamic factories_per_player/2.
 % :-dynamic colors/2.
