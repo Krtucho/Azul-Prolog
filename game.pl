@@ -140,28 +140,43 @@ update_plays(Factory_number,Color):-
 %calcula el valor que tendra la jugada, de esto depende que sea seleccionada, en el caso que complete una fila se suma dos al descarte y en caso contrario, este valor es el descarte
 % calculate_play_value(0,Discard,Value):-!, Value is 2-Discard.
 % calculate_play_value(_,Discard,Value):-Value is 0-Discard.
-calculate_play_value(Discard,Value):-Discard >=0, !, Value is 2-Discard. 
+calculate_play_value(Discard,Value):-Discard >= 0, !, Value is 2-Discard. 
 calculate_play_value(Discard,Value):-Discard < 0,Value is 0.
 % en caso de que se pueda poner el color en la fila se actualiza la mejor jugada hasta el momento
 append_play_player(0,_,_,_,_):-!.
 append_play_player(1,Value,Row,Actual_Player,Discard_Amount):-
     better_play_player(Actual_Player,_,_,Better_Actual_Value),
-    Value >= Better_Actual_Value,
+    Value > Better_Actual_Value,
     retract(better_play_player(Actual_Player,_,_,Better_Actual_Value)),
     assert(better_play_player(Actual_Player,Row,Discard_Amount,Value)).
 append_play_player(1,_,_,_,_).
 
-%encargado de poner los azulejos en la escalera y enviar los que sobren al descarte en caso de la fila 6, van todos al descarte
+%encargado de poner los azulejos en la escalera, en caso de la fila 6, van todos al descarte
 put_tiles_in_row(Actual_Player,6,Color,Amount):-!.
 put_tiles_in_row(Actual_Player,Row,Color,Amount):-
-    update_row(Actual_Player, Color, Amount, Row).
+    get_row_n(Actual_Player,Row,(_,Old_Amount)),
+    New_Amount is Old_Amount+Amount,
+    update_row(Actual_Player, Color, New_Amount, Row).
 
 %encargado de tanto actualizar la cantidad de descarte que tiene el jugador  como de mandar los azulejos al cementerio(simulacion del descarte)
 drop_tiles_general(Actual_Player,Color,0):-!.
 drop_tiles_general(Actual_Player,Color,Discard_Amount):-
+    format("El jugador ~a va a descartar ~a fichas de color ~a",[Actual_Player,Discard_Amount,Color]),
     append_tiles_to_cementery(Color, Discard_Amount),
+    players(Actual_Player,_,_,_,_,_,_,_,Amount_Old),
+    Total is Amount_Old + Discard_Amount,
     drop_tiles(Actual_Player, Discard_Amount, Total).
 
+
+%si es una posicion viable dondde poner fichas la agrega a las posiciones y calcula el valor de la jugada
+put_play_player(0,_,_,_,_,_).
+put_play_player(1,Actual_Player,Color, Amount, Actual_Row, NewA):-
+    format("se puede poner en la fila ~a ~n",[Actual_Row]),
+    calculate_play_value(NewA,Value),
+    Empty_Spaces is 0-NewA,
+    append_play_player(1,Value,Actual_Row,Actual_Player,Empty_Spaces).
+
+    % better_play_player(Actual_Player, Better_Actual_Row, _, Better_Actual_Value),
 
 %entre todas las filas en que un jugador puede poner un color selecciona la mas conveniente (la de mayor Value) y devuelve la cantidad de fichas que se descartan
 choose_row_to_put_tiles(0,Actual_Player,_,_,Row,Discard_Amount):-!,
@@ -170,24 +185,21 @@ choose_row_to_put_tiles(Actual_Row,Actual_Player,Color,Amount,Row,Discard_Amount
     can_set_tiles_in_row(Actual_Player,Color, Amount, Actual_Row, NewA),% NewA es descartes y -espacios vacios
     % format("sali de can set tiles con newA ~a, Actual Row ~a ~n",[NewA,Actual_Row]),
     dynamic_bool(Can_set_in_that_row),
-    format("se puede poner en la fila ~a ~a ~n",[Actual_Row,Can_set_in_that_row]),
-    calculate_play_value(NewA,Value),
-    Empty_Spaces is 0-NewA,
-    append_play_player(Can_set_in_that_row,Value,Actual_Row,Actual_Player,Empty_Spaces),
-    % better_play_player(Actual_Player, Better_Actual_Row, _, Better_Actual_Value),
+    put_play_player(Can_set_in_that_row,Actual_Player,Color, Amount, Actual_Row, NewA),
     Actual_Row1 is Actual_Row-1,
     choose_row_to_put_tiles(Actual_Row1,Actual_Player,Color,Amount,Row,Discard_Amount).
 
 
 %el jugador actual toma el color Color de la fabrica Factories_number y coloca los azulejos en su escalera
 play(Actual_Player,Factories_number,Color):-
-    plays(Factories_number,Color,Amount),
-    update_plays(Factories_number,Color),
+    colors(Color,Color_String),
+    plays(Factories_number,Color_String,Amount),
+    update_plays(Factories_number,Color_String),
     % print("sali de update plays ~n"),
     Drop_value is 0-Amount,
     assert(better_play_player(Actual_Player,6,Amount,Drop_value)),%en caso de que no se pueda colocar en ninguna fila entonces se colocan todas las baldosas en el descarte
     choose_row_to_put_tiles(5,Actual_Player,Color,Amount,Row,Discard_Amount),
-    format("El jugador ~a toma ~a fichas de color ~a de la fabrica ~a y las coloca en su fila ~a ~n",[Actual_Player,Amount,Color,Factories_number,Row]),
+    format("El jugador ~a toma ~a fichas de color ~a de la fabrica ~a y las coloca en su fila ~a ~n",[Actual_Player,Amount,Color_String,Factories_number,Row]),
     put_tiles_in_row(Actual_Player,Row,Color,Amount),
     drop_tiles_general(Actual_Player,Color,Discard_Amount).
 
@@ -325,30 +337,32 @@ fill_that_factory(Factory_number,N):-
 
 %##############################################-Parte de final de Ronda-######################################################################################
 
+%vacia el escalon n de la escalera de player y manda n-1 azulejos al cementerio
+empty_n_row_of_player(Player,Row):-
+    get_row_n(P, Row, Result),    
+    update_row(Player, 0, 0, Row),
+    Extra is Row-1,
+    append_tiles_to_cementery(Color, Extra).
 
+% si esta llena una fila de la esscalera, encargado de colocar un azulejo en el muro de un jugador despues de que haya completado una fila de ese color
+% put_tile_in_wall(0,_,_,_):-!.
+put_tile_in_wall(0,Player,Row,Color):-
+    players(Player,_,_,_,_,_,_,Matrix,_),
+    find_col(Color,Row,Column),
+    insert_tile(Row, Column, Matrix, Color),
+    calculate_score(Row,Column, Matrix, Score_to_Add),
+    empty_n_row_of_player(Player,Row),
+    add_score(Player, Score_to_Add).
 
-
-
-
-put_tile_in_wall():-
-    % Dada una matriz M inserta en la posicion (R,C) la loseta de color Tile
-    % R -> Fila
-    % C -> Columna
-    % M -> Matriz
-    % V -> Valor ubicado en la posicion (R,C) de la matriz M
-    insert_tile(R, C, M, Tile),
-    % Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontal(fila) y verticalmente(columna) desde esa casilla
-    % R -> Fila
-    % C -> Columna
-    % M -> Matriz
-    % S -> Puntuacion
-    calculate_score(R,C, M, S).
-
-check_every_step(0,Players_number,Factories_number):-!.
-check_every_step(Position,Players_number,Factories_number):-
+%chequea en cada escalon de la escalera si se ha completado y lo manda entonces a 
+check_every_row(0,Actual_Player,Factories_number):-!.
+check_every_row(Position,Actual_Player,Factories_number):-
+    get_row_n(Actual_Player,Position,(Color,Amount)),
+    Full is Position-Amount,
+    put_tile_in_wall(Full,Actual_Player,Position,Color),
     Position1 is Position-1,
-    check_every_step(Position1,Players_number,Factories_number).
+    check_every_row(Position1,Actual_Player,Factories_number).
 
 
 
-%##############################################-End Parte de final de Ronda-######################################################################################
+%##############################################-End Parte de final de Ronda-#####################################################################################
