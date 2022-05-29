@@ -88,8 +88,7 @@ round(Players_number,Factories_number):-
     %aqui buscar el primer jugador de esta ronda
 
     play_to_end_round(1,Actual_Player,Players_number).
-
-    % end_of_round(Players_number,Factories_number).
+    end_of_round(Players_number,Factories_number).
     % comprobate_end_game(Players_number).
 
 
@@ -99,6 +98,7 @@ start_game(Players_number):-
     inicialize_game(Factories_number),
     assert(first_player(1)),
     round(Players_number,Factories_number).
+
 
 
 

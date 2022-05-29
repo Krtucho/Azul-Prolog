@@ -78,7 +78,8 @@ choose_play(Factory_number,Color):-
     findall((Factory_number,Color),(plays(Factory_number,Color,_),not_total(Factory_number)),Factories),
     format("~n"),
     print(Factories),
-    random(0,Total,Random),
+    Total1 is Total+1,
+    random(1,Total1,Random),
     format("~n Random:~a ~n",[Random]),
     search_pos_n_on_plays(Random,Factory_number,Color,Factories),
     format("Se selecciono la jugada ~a, ~a ~n",[Factory_number,Color]).
