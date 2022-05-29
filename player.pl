@@ -277,7 +277,7 @@ drop_tile(P, D1) :-
 % 1 -> Cantidad de fichas a descartar
 % D1 -> Cantidad de fichas que ha descartado luego de descartar esta ultima
 drop_tiles(P, 1, D1) :-
-    drop_tile(P, D1),
+    drop_tile(P, 1),
     !.
 
 % El jugador descarta N fichas

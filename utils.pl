@@ -14,7 +14,8 @@
 %                                                           pp                  
 
 % Booleano dinamico que se le podra asignar 0 = False o 1 = True
-:-dynamic_bool/1.
+:- dynamic dynamic_bool/1.
+
 
 start_dynamic_bool:-
     assert(dynamic_bool(1)).

@@ -2,6 +2,21 @@
 :-[game].
 :-[player].
 
+
+
+%deja vacios todos los predicados dinamicos para que se pueda jugar el juego desde el comienzo
+clear_all:-
+    retractall(bag(_,_)),
+    retractall(factory(_,_)),
+    retractall(cementery(_,_)),
+    retractall(center(_,_)),
+    retractall(plays(_,_,_)),
+    retractall(better_play_player(_,_,_,_)),
+    retractall(first_player(_)),
+    retractall(players(_,_,_,_,_,_,_,_,_)),
+    retractall(temp_score(_)),
+    retractall(dynamic_bool(_)).
+
 % primera seccion de la ronda  en donde se rellenan todas las factorias
 fill_factories(1):-!,
     fill_that_factory(1,4).
@@ -22,8 +37,8 @@ comprobate_first_player(_,_).
 %se le pasa el jugador actual 
 play_to_end_round(0,Actual_Player,Players_number):-!.
 play_to_end_round(N,Actual_Player,Players_number):-
-    choose_play(Factories_number,Color_String),
-    colors(Color,Color_String),
+    choose_play(Factories_number,Color),
+    % colors(Color,Color_String),
     comprobate_first_player(Factories_number,Actual_Player),    
     % update_plays(Factories_number,Color),
     play(Actual_Player,Factories_number,Color),
@@ -53,8 +68,9 @@ end_of_round(Players_number,Factories_number):-
 
 
 % cuarta seccion de la ronda en donde se realiza la comprobacion de que se cumplan las condiciones de finalizacion del juego
-% comprobate_end_game():-
-%     .
+comprobate_end_game().
+
+
 
 %desarrollo de una ronda 
 round(Players_number,Factories_number):-
@@ -80,7 +96,23 @@ start_game(Players_number):-
     round(Players_number,Factories_number).
 
 
+
+
 start:-
-    start_game(2).
+    % start_game(2).
+    factories_per_player(Players_number,Factories_number),
+    inicialize_game(Factories_number),
+    assert(first_player(1)),
+
+    first_player(Actual_Player),
+    retract(first_player(Actual_Player)),
+    fill_factories(Factories_number),
+    create_players(Players_number),
+    create_plays(Factories_number),
+
+    play_to_end_round(1,Actual_Player,Players_number).
+
+
+
 
 start.

@@ -192,14 +192,14 @@ choose_row_to_put_tiles(Actual_Row,Actual_Player,Color,Amount,Row,Discard_Amount
 
 %el jugador actual toma el color Color de la fabrica Factories_number y coloca los azulejos en su escalera
 play(Actual_Player,Factories_number,Color):-
-    colors(Color,Color_String),
-    plays(Factories_number,Color_String,Amount),
-    update_plays(Factories_number,Color_String),
+    % colors(Color,Color_String),
+    plays(Factories_number,Color,Amount),
+    update_plays(Factories_number,Color),
     % print("sali de update plays ~n"),
     Drop_value is 0-Amount,
     assert(better_play_player(Actual_Player,6,Amount,Drop_value)),%en caso de que no se pueda colocar en ninguna fila entonces se colocan todas las baldosas en el descarte
     choose_row_to_put_tiles(5,Actual_Player,Color,Amount,Row,Discard_Amount),
-    format("El jugador ~a toma ~a fichas de color ~a de la fabrica ~a y las coloca en su fila ~a ~n",[Actual_Player,Amount,Color_String,Factories_number,Row]),
+    format("El jugador ~a toma ~a fichas de color ~a de la fabrica ~a y las coloca en su fila ~a ~n",[Actual_Player,Amount,Color,Factories_number,Row]),
     put_tiles_in_row(Actual_Player,Row,Color,Amount),
     drop_tiles_general(Actual_Player,Color,Discard_Amount).
 
@@ -366,3 +366,30 @@ check_every_row(Position,Actual_Player,Factories_number):-
 
 
 %##############################################-End Parte de final de Ronda-#####################################################################################
+
+%###############################################-Parte del final del juego-#####################################################################
+
+
+%por cada uno de los jugadores busca la cantidad de diagonales, filas y columnas completadas para sumar a su puntuacion 
+actualize_score_end_game_per_player(0).
+actualize_score_end_game_per_player(Player).
+
+%se llama con 0 o 1 como primer argumento donde 1 significa que el juego ha acabado y 0 que no
+%se encarga de mandar a contar la cantidad de diagonales, filas y columnas completadas para sumar a la puntuacion de cada jugador
+end_game(0).
+end_game(1).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
