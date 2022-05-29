@@ -68,7 +68,11 @@ end_of_round(Players_number,Factories_number):-
 
 
 % cuarta seccion de la ronda en donde se realiza la comprobacion de que se cumplan las condiciones de finalizacion del juego
-comprobate_end_game().
+comprobate_end_game(Players_number,Factories_number):-
+    player_fill_row(Players_number,End_player),
+    tiles_insufficient(Factories_number,End_tiles),
+    End_Game is End_player +  End_tiles,
+    end_game(End_Game,Players_number).
 
 
 
@@ -85,7 +89,7 @@ round(Players_number,Factories_number):-
     play_to_end_round(1,Actual_Player,Players_number).
 
     % end_of_round(Players_number,Factories_number).
-    % comprobate_end_game().
+    % comprobate_end_game(Players_number).
 
 
 
@@ -94,7 +98,6 @@ start_game(Players_number):-
     inicialize_game(Factories_number),
     assert(first_player(1)),
     round(Players_number,Factories_number).
-
 
 
 

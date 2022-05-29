@@ -82,6 +82,9 @@ choose_play(Factory_number,Color):-
 
 % ###############################################-End Parte de Jugadas-########################################################################
 
+
+%##############################################-Parte Esencial del Juego-########################################################################
+
 %envia los azulejos al cementerio 
 append_tiles_to_cementery(Color, Amount):-
     cementery(Color,Old_Amount),
@@ -208,6 +211,7 @@ play(Actual_Player,Factories_number,Color):-
 end_round(End):-
     plays(10,'total',Total),
     End=Total.
+%##############################################-End Parte Esencial del Juego-########################################################################
 
 %#############################################-Crear cada parte necesaria en el juego-###############################################################
 % lugar donde se van las fichas al ser descartadas de los tableros de los jugadores
@@ -232,15 +236,25 @@ create_center():-
 
 
 % rellena la bolsa cuando se acaban las fichas en esta
-refill_bag():-
-    cementery(CementeryColor,CementeryColorCount),
-    bag(BagColor,BagColorCount),
-    BagColor=:=CementeryColor,
-    retract(cementery(CementeryColor, CementeryColorCount)),
-    retract(bag(BagColor, BagColorCount)),
-    assert(cementery(CementeryColor,0)),
+refill_bag():-refill_bag_per_color(5).
+% rellena la bolsa por cada uno de los colores
+refill_bag_per_color(0):-!.
+refill_bag_per_color(ColorInt):-
+    colors(ColorInt,Color),
+    cementery(Color,CementeryColorCount),
+    bag(Color,BagColorCount),
+    % BagColor=:=CementeryColor,
+    retract(cementery(Color, CementeryColorCount)),
+    retract(bag(Color, BagColorCount)),
+    assert(cementery(Color,0)),
     BagColorCountNew is BagColorCount+CementeryColorCount,
-    assert(bag(BagColor,BagColorCountNew)).
+    bag('total',Total),
+    retract(bag('total',Total)),
+    NewTotal is Total+CementeryColorCount,
+    assert(bag('total',NewTotal)),
+    assert(bag(Color,BagColorCountNew)),
+    Color_Int_New is ColorInt-1,
+    refill_bag_per_color(Color_Int_New).
 
 
 % la bolsa es de la forma (color,cantidad de azulejos de ese color que tiene) y tiene un campoo en el que dice la cantidad total de azulejos que hay en la bolsa(total)
@@ -370,15 +384,68 @@ check_every_row(Position,Actual_Player,Factories_number):-
 %###############################################-Parte del final del juego-#####################################################################
 
 
+%comprueba si el jugador completo alguna fila 
+player_filled(0,Players_number,End):-!,
+    Players_number1 is Players_number-1,
+    player_fill_row(Players_number,End).
+player_filled(N,Players_number,End):-End is 1.
+
+
+%encargado de comprobar si alguno de los jugadores completo una fila para terminar el juego
+player_fill_row(0,End):-!, End is 0.
+player_fill_row(Players_number,End):-
+    players(Players_number,_,_,_,_,_,_,Matrix,_),
+    row_is_filled(1, Matrix),
+    dynamic_bool(dynamic_bool1),
+    row_is_filled(2, Matrix),
+    dynamic_bool(dynamic_bool2),
+    row_is_filled(3, Matrix),
+    dynamic_bool(dynamic_bool3),
+    row_is_filled(4, Matrix),
+    dynamic_bool(dynamic_bool4),
+    row_is_filled(5, Matrix),
+    dynamic_bool(dynamic_bool5),
+    Player_filled is dynamic_bool1 + dynamic_bool2 + dynamic_bool3 + dynamic_bool4 + dynamic_bool5,%es 0 si ninguna fila se ha llenad0
+    player_filled(Player_filled,Players_number,End).
+
+
+%si la cantidad de fichas que se requieren para rellenar las fabricas es menor que la cantidad que hay actualmente en la bolsa, esta se rellena con las fichas del cementerio
+refill_bag_from_cementery(N):- N < 0,!.
+refill_bag_from_cementery(N):- refill_bag().
+
+%devuelve 1 si no quedan suficientes fichas para rellenar las fabricas y 0 en caso contrario
+sufficient_tiles(New_Need_refill, End):- New_Need_refill < 0,!,End is 1.
+sufficient_tiles(New_Need_refill, End):- End is 0.
+
+%encargado de revisar si en la bolsa no quedan suficientes azulejos, si es el caso pasa los del cementerio a la bolsa y si siguen siendo insuficientes
+%el juego se da por terminado (end es 1 si no alcanzan los azulejos)
+tiles_insufficient(Factories_number,End):-
+    bag('total',Total),
+    Tiles_need is Factories_number * 4,
+    Need_refill is Total - Tiles_need,
+    refill_bag_from_cementery(Need_refill),
+    bag('total',New_Total),
+    New_Need_refill is New_Total - Tiles_need,
+    sufficient_tiles(New_Need_refill, End).
+
+
 %por cada uno de los jugadores busca la cantidad de diagonales, filas y columnas completadas para sumar a su puntuacion 
-actualize_score_end_game_per_player(0).
-actualize_score_end_game_per_player(Player).
+actualize_score_end_game_per_player(0):-!.
+actualize_score_end_game_per_player(Player):-
+    players(Player,_,_,_,_,_,_,Matrix,_),
+    calculate_row_col_diag_filled_score(Matrix, Gained_Score),
+    add_score(Player, Gained_Score),
+    Player1 is Player-1,
+    actualize_score_end_game_per_player(Player1).
+
 
 %se llama con 0 o 1 como primer argumento donde 1 significa que el juego ha acabado y 0 que no
 %se encarga de mandar a contar la cantidad de diagonales, filas y columnas completadas para sumar a la puntuacion de cada jugador
-end_game(0).
-end_game(1).
+end_game(0,_):-!.
+end_game(N,Players_number):-
+    actualize_score_end_game_per_player(Players_number).
 
+%###############################################-End Parte del final del juego-#####################################################################
 
 
 
