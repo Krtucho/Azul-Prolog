@@ -188,8 +188,8 @@ put_tiles_in_row(Actual_Player,Row,Color,Amount):-
 %encargado tanto de actualizar la cantidad de descarte que tiene el jugador, como de mandar los azulejos al cementerio(simulacion del descarte)
 drop_tiles_general(Actual_Player,Color,Discard_Amount):-Discard_Amount=<0,!.
 drop_tiles_general(Actual_Player,Color,Discard_Amount):-
-    format("El jugador ~a va a descartar ~a fichas de color ~a",[Actual_Player,Discard_Amount,Color_String]),
     colors(Color,Color_String),
+    format("El jugador ~a va a descartar ~a fichas de color ~a",[Actual_Player,Discard_Amount,Color_String]),
     append_tiles_to_cementery(Color_String, Discard_Amount),
     players(Actual_Player,_,_,_,_,_,_,_,Amount_Old),
     Total is Amount_Old + Discard_Amount,
@@ -199,8 +199,9 @@ drop_tiles_general(Actual_Player,Color,Discard_Amount):-
 %si es una posicion viable dondde poner fichas la agrega a las posiciones y calcula el valor de la jugada
 put_play_player(0,_,_,_,_,_).
 put_play_player(1,Actual_Player,Color, Amount, Actual_Row, NewA):-
-    format("se puede poner en la fila ~a ~n",[Actual_Row]),
     calculate_play_value(NewA,Value),
+    format("se puede poner en la fila ~a con descarte ~a y valor ~a ~n",[Actual_Row,NewA,Value]),
+
     % Empty_Spaces is 0-NewA,
     append_play_player(1,Value,Actual_Row,Actual_Player,NewA).
 
@@ -208,7 +209,8 @@ put_play_player(1,Actual_Player,Color, Amount, Actual_Row, NewA):-
 
 %entre todas las filas en que un jugador puede poner un color selecciona la mas conveniente (la de mayor Value) y devuelve la cantidad de fichas que se descartan
 choose_row_to_put_tiles(0,Actual_Player,_,_,Row,Discard_Amount):-!,
-    better_play_player(Actual_Player,Row,Discard_Amount,_).
+    better_play_player(Actual_Player,Row,Discard_Amount,_),
+    retract(better_play_player(Actual_Player,Row,Discard_Amount,_)).
 choose_row_to_put_tiles(Actual_Row,Actual_Player,Color,Amount,Row,Discard_Amount):-
     can_set_tiles_in_row(Actual_Player,Color, Amount, Actual_Row, NewA),% NewA es descartes y -espacios vacios
     % format("sali de can set tiles con newA ~a, Actual Row ~a ~n",[NewA,Actual_Row]),
@@ -365,7 +367,8 @@ fill_that_factory(Factory_number,0):-!.
 fill_that_factory(Factory_number,N):-
     Count1 is N-1,
     bag('total',Len),
-    random(1,Len,Random),
+    % Len1 is Len + 1,
+    random(0,Len,Random),
     search_pos_n_on_bag(Random,0,1,Color),
     colors(Color,ColorString),
     append_tile_to_factory(Factory_number,ColorString),    

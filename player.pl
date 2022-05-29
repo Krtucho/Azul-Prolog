@@ -111,22 +111,22 @@ update_row(P, C, A, 1):-
 % Lo mismo que el anterior, pero Row=2
 % Row = 2
 update_row(P, C, A, 2):-
-    update_R1(P, (C,A)).
+    update_R2(P, (C,A)).
 
 % Lo mismo que el anterior, pero Row=3
 % Row = 3
 update_row(P, C, A, 3):-
-    update_R1(P, (C,A)).
+    update_R3(P, (C,A)).
 
 % Lo mismo que el anterior, pero Row=4
 % Row = 4
 update_row(P, C, A, 4):-
-    update_R1(P, (C,A)).
+    update_R4(P, (C,A)).
 
 % Lo mismo que el anterior, pero Row=5
 % Row = 5
 update_row(P, C, A, 5):-
-    update_R1(P, (C,A)).
+    update_R5(P, (C,A)).
 
 %devuelve la tupla en la fila 1,2,3,4,5 respectivamente del jugador player 
 get_row_1(P,Result):- players(P,_,Result,_,_,_,_,_,_).
