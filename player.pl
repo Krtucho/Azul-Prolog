@@ -33,7 +33,7 @@ update_first_player(P):-
 create_player(N):-
     assert(players(N, 0, (0,0), (0,0), (0,0), (0,0), (0,0), 
     [
-        [1,1,1,1,1],
+        [0,0,0,0,0],
         [0,0,0,0,0],
         [0,0,0,0,0],
         [0,0,0,0,0],
@@ -128,6 +128,22 @@ update_row(P, C, A, 4):-
 update_row(P, C, A, 5):-
     update_R1(P, (C,A)).
 
+%devuelve la tupla en la fila 1,2,3,4,5 respectivamente del jugador player 
+get_row_1(P,Result):- players(P,_,Result,_,_,_,_,_,_).
+get_row_2(P,Result):- players(P,_,_,Result,_,_,_,_,_).
+get_row_3(P,Result):- players(P,_,_,_,Result,_,_,_,_).
+get_row_4(P,Result):- players(P,_,_,_,_,Result,_,_,_).
+get_row_5(P,Result):- players(P,_,_,_,_,_,Result,_,_).
+
+%obtiene la tupla de la fila n
+%P Player
+get_row_n(P,1,Result):-get_row_1(P,Result).
+get_row_n(P,2,Result):-get_row_2(P,Result).
+get_row_n(P,3,Result):-get_row_3(P,Result).
+get_row_n(P,4,Result):-get_row_4(P,Result).
+get_row_n(P,5,Result):-get_row_5(P,Result).
+
+
 % Dice si es posible ubicar las fichas(A=cantidad de fichas) de color C en el jugador P en la fila R
 % P -> Player
 % C -> Color
@@ -143,12 +159,13 @@ can_set_tiles_in_row(P,C, A, 1, NewA):-
     % R =:= 0,
     % not(R), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 =:= 0;
-    C1 =:= C),
+    (C1 = 0; C1 = C),
     % A + A1 =< 1,
+    % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,
     A2 is 1 - A1,
     NewA is A - A2.
+    % format("NewA es ~a ~n ",[NewA]).
 can_set_tiles_in_row(P,C, A, 1, NewA).
 
 % Lo mismo que el anterior, pero Row=2
@@ -159,58 +176,62 @@ can_set_tiles_in_row(P,C, A, 2, NewA):-
     set_dynamic_bool_false,
     not(color_in_row(C, 2, W, R)), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 =:= 0;
-    C1 =:= C),
+    (C1 = 0; C1 = C),
     % A + A1 =< 1,
+    % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,
     A2 is 2 - A1,
     NewA is A - A2.
+    % format("NewA es ~a ~n",[NewA]).
 can_set_tiles_in_row(P,C, A, 2, NewA).
 % Lo mismo que el anterior, pero Row=3
 % Row = 3
 can_set_tiles_in_row(P,C, A, 3, NewA):-
-    players(P, _, _,_,R3,  _, _, W, _),
+    players(P, _, _,_,R3, _, _, W, _),
     (C1,A1) = R3,
     set_dynamic_bool_false,
     not(color_in_row(C, 3, W, R)), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 =:= 0;
-    C1 =:= C),
+    (C1 = 0; C1 = C),
     % A + A1 =< 1,
+    % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,
     A2 is 3 - A1, % A2 = Cantidad restante que se pueden ubicar en la fila R3
     NewA is A - A2.
+    % format("NewA es  ~a ~n",[NewA]).
 can_set_tiles_in_row(P,C, A, 3, NewA).
 % Lo mismo que el anterior, pero Row=4
 % Row = 4
 can_set_tiles_in_row(P,C, A, 4, NewA):-
-    players(P, _, _,_,_, R4, _, _, _),
+    players(P, _, _,_,_, R4, _, W, _),
     (C1,A1) = R4,
     set_dynamic_bool_false,
     not(color_in_row(C, 4, W, R)), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 =:= 0;
-    C1 =:= C),
+    (C1 = 0; C1 = C),
     % A + A1 =< 1,
+    % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,
     A2 is 4 - A1,
     NewA is A - A2.
+    % format("NewA es ~a ~n ",[NewA]).
 can_set_tiles_in_row(P,C, A, 4, NewA).
 
 % Lo mismo que el anterior, pero Row=5
 % Row = 5
 can_set_tiles_in_row(P,C, A, 5, NewA):-
-    players(P, _, _,_,_, _, R5, _, _),
+    players(P, _, _,_,_, _, R5, W, _),
     (C1,A1) = R5,
     set_dynamic_bool_false,
     not(color_in_row(C, 5, W, R)), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 =:= 0;
-    C1 =:= C),
+    (C1 = 0; C1 = C),
     % A + A1 =< 1,
+    % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,
     A2 is 5 - A1,
     NewA is A - A2.
+    % format("NewA es  ~a ~n",[NewA]).
 can_set_tiles_in_row(P,C, A, 5, NewA).
 
 % Calcular la puntuacion a restar con n fichas descartadas.
@@ -256,7 +277,7 @@ drop_tile(P, D1) :-
 % 1 -> Cantidad de fichas a descartar
 % D1 -> Cantidad de fichas que ha descartado luego de descartar esta ultima
 drop_tiles(P, 1, D1) :-
-    drop_tile(P, D1),
+    drop_tile(P, 1),
     !.
 
 % El jugador descarta N fichas

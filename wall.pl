@@ -103,11 +103,13 @@ valid_pos_to_insert_tile(R, C, M, V).
 % Return
 % Result, contiene el valor de la posicion 
 color_in_row(T, R, W, Result):-
+    %T1 is T-1,
+    R1 is R-1,
     colors(T, T_str),
-    find_col(T_str, R, C),
+    find_col(T_str, R1, C),
     % R1 is R-1,
     % C1 is C-1,
-    get_values([[R,C]], W, [Result]),
+    get_values([[R1,C]], W, [Result]),
     Result =:= 1.
 
 % Dada una matriz M inserta en la posicion (R,C) la loseta de color Tile

@@ -1,4 +1,6 @@
-[game_utils].
+:-[utils].
+:-[game_utils].
+:-[player].
 
 
 inicialize_game(Factories_number):-
@@ -12,6 +14,16 @@ inicialize_game(Factories_number):-
     create_factories(Factories_number).
 
 
+% % %se crea el descarte que le corresponde a cada jugador, al comienzo es una lista vacia
+% % create_discard(0):-!.
+% % create_discard(Players_number):-
+% %     assert(discard_player(Players_number,[])),
+% %     Players_number1 is Players_number-1,
+% %     create_discard(Players_number1).
+
+
+%###########################################################-Parte de Jugadas-#########################################################
+
 %al principio de cada ronda se encarga de crear todas las jugadas posibles de la ronda con los azulejos que hay en las fabricas
 create_plays(0):-!.
 create_plays(Factories_number):-
@@ -24,72 +36,185 @@ create_plays(Factories_number):-
 append_colors_to_plays(Factories_number,[]):-!.
 append_colors_to_plays(Factories_number,[Color1|RColors]):-
     % format("~n en la fabrica ~a encontro color ~a ~n",[Factories_number,Color1]),
-    append_play(Factories_number,Color1),
+    append_play(Factories_number,Color1,1),
     append_colors_to_plays(Factories_number,RColors).
 
-%agrega una jugada cuando el color aun no estaba registrado
-append_play(Factories_number,Color):-
-    not(plays(Factories_number,Color,X)),
+%agrega una jugada cuando el color aun no estaba registrado en esa fabrica
+append_play(Factories_number,Color,Count):-
+    not(plays(Factories_number,Color,_)),
     !,
     plays(10,'total',Total),
     Total1 is Total+1,
     retract(plays(10,'total',Total)),
-    assert(plays(Factories_number,Color,1)),
+    assert(plays(Factories_number,Color,Count)),
     % format("crear la jugada fabrica: ~a con color: ~a y cant nueva ~a ~n",[Factories_number,Color,1]),
     % format("el total ahora es ~a ~n",[Total1]),
     assert(plays(10,'total',Total1)).
-%agrega una jugada cuando el color ya estaba en la fabrica, o sea agrega 1 al contador
-append_play(Factories_number,Color):-
-    plays(Factories_number,Color,Count),
-    retract(plays(Factories_number,Color,Count)),
-    Count1 is Count+1,    
+%agrega una jugada cuando el color ya estaba en la fabrica, o sea agrega la cantidad nueva al contador
+append_play(Factories_number,Color,Count):-
+    plays(Factories_number,Color,X),
+    retract(plays(Factories_number,Color,X)),
+    Count1 is Count+X,    
     % format("en la fabrica ~a se encontro el color ~a por vez ~a ~n",[Factories_number,Color,Count1]),
     assert(plays(Factories_number,Color,Count1)).
-%indica si es el play destinado a almacenar el total de las jugadas
-not_total(N):- not(N=:=10).
-
-%de todas las jugadas posibles, el jugador escoge una random(o sea devuelve el numero de la fabrica y el color)
-choose_play(Factory_number,Color):-    
-    plays(10,'total',Total),
-    % random(1,5,RandomColor),
-    % colors(RandomColor,Color),
-    % print(Total),    
-    % print("           "),
-    findall((Factory_number,Color),(plays(Factory_number,Color,Cant),not_total(Factory_number)),Factories),
-    % print(Factories),
-    % print("           "),
-    % random(1,Total,Random),
-    random(1,Total,Random),
-    % format("~n El random seleccionado es ~a ~n",[Random]),
-    search_pos_n_on_plays(Random,Factory_number,Color,Factories).
-
-
-%cuando se realiza una jugada se encarga de quitar esa jugada y enviar el resto de las fichas de esa fabrica al centro
-update_plays(Factory_number,Color):-
-    plays(Factories_num,Color,Count).
 
 %se le pasa la lista para encontrar el elemento N
 search_pos_n_on_plays(0,Factory_number,Color,[(X,Y)|_]):-!,
     % format("~n el seleccionado es ~a ~a ~n",[X,Y]),
     Color = Y,
     Factory_number = X.
-search_pos_n_on_plays(N,Factory_number,Color,[(X,Y)|Factories]):-
+search_pos_n_on_plays(N,Factory_number,Color,[(_,_)|Factories]):-
     % format("el par es (~a,~a)~n",[X,Y]),
     N1 is N-1,
-    % print(N1),
     search_pos_n_on_plays(N1,Factory_number,Color,Factories).
 
 
-%el jugador actual toma el color Color de la fabrica Factories number y coloca los azulejos en su escalera
-play(Actual_Player,Factories_number,Color):-
-    update_plays(Factories_number,Color).
+%indica si es el play destinado a almacenar el total de las jugadas
+not_total(N):- not(N=:=10).
+%de todas las jugadas posibles, el jugador escoge una random (o sea devuelve el numero de la fabrica y el color)
+choose_play(Factory_number,Color):-    
+    plays(10,'total',Total),
+    findall((Factory_number,Color),(plays(Factory_number,Color,Cant),not_total(Factory_number)),Factories),
+    random(1,Total,Random),
+    search_pos_n_on_plays(Random,Factory_number,Color,Factories).
 
-%comprueba si no quedan jugadas por tomar (plays) esta vacio
+
+
+% ###############################################-End Parte de Jugadas-########################################################################
+
+
+%##############################################-Parte Esencial del Juego-########################################################################
+
+%envia los azulejos al cementerio 
+append_tiles_to_cementery(Color, Amount):-
+    cementery(Color,Old_Amount),
+    retract(cementery(Color,Old_Amount)),
+    New_Amount is Old_Amount+Amount,
+    assert(cementery(Color,New_Amount)).
+
+%coloca Count azulejos de color Color en el Centro del Juego
+append_tiles_to_center(Color,Count):-
+    center(Color,Count_Old),
+    center('total',Total_Old),
+    Total_New is Count+Total_Old,
+    retract(center('total',Total_Old)),
+    retract(center(Color,Count_Old)),
+    Count_New is Count+Count_Old,
+    assert(center('total',Total_New)),
+    assert(center(Color,Count_New)).
+
+
+%cuando se toman azulejos de una fabrica se tiene que enviar el resto que queda en la fabrica al centro (factory 0)
+send_to_center(Factory_number):-
+    % plays(Factory_number,Color,Count),       
+    findall((Factory_number,Color,Count), plays(Factory_number,Color,Count), Plays_In_Factory),
+    send_list_to_center(Plays_In_Factory).
+%en esta lista en donde estan todas las unificaciones de las jugadas de una fabrica, se envian todas al centro
+send_list_to_center([]).
+send_list_to_center([(Factory_number,Color,Count)|Plays_In_Factory]):-    
+    % format("Quitando el color ~a con cantidad ~a ~n",[Color,Count]),
+    % plays(10,'total',Total),
+    % retract(plays(10,'total',Total)),
+    retract(plays(Factory_number,Color,Count)),
+    % Total1 is Total-1,
+    % assert(plays(10,'total',Total1)),
+    append_tiles_to_center(Color,Count),
+    append_play(0,Color,Count),
+    send_list_to_center(Plays_In_Factory).    
+
+
+%cuando se realiza una jugada se encarga de quitar esa jugada y enviar el resto de las fichas de esa fabrica al centro
+update_plays(Factory_number,Color):-
+    % factory(Factory_number,_),
+    retract(plays(Factory_number,Color,_)),    
+    % retract(factory(Factory_number,_)),
+    send_to_center(Factory_number),
+    % print("Sali de Go to center"),
+    retract(factory(Factory_number,_)),
+    % factory('total',Total_old),
+    % retract(factory('total',Total_Old)),
+    % assert(factory('total',Total_New)),
+    plays(10,'total',Total_Old),
+    Total_New is Total_Old-1,
+    retract(plays(10,'total',Total_Old)),
+    assert(plays(10,'total',Total_New)),
+    assert(factory(Factory_number,[])).
+
+%calcula el valor que tendra la jugada, de esto depende que sea seleccionada, en el caso que complete una fila se suma dos al descarte y en caso contrario, este valor es el descarte
+% calculate_play_value(0,Discard,Value):-!, Value is 2-Discard.
+% calculate_play_value(_,Discard,Value):-Value is 0-Discard.
+calculate_play_value(Discard,Value):-Discard >= 0, !, Value is 2-Discard. 
+calculate_play_value(Discard,Value):-Discard < 0,Value is 0.
+% en caso de que se pueda poner el color en la fila se actualiza la mejor jugada hasta el momento
+append_play_player(0,_,_,_,_):-!.
+append_play_player(1,Value,Row,Actual_Player,Discard_Amount):-
+    better_play_player(Actual_Player,_,_,Better_Actual_Value),
+    Value > Better_Actual_Value,
+    retract(better_play_player(Actual_Player,_,_,Better_Actual_Value)),
+    assert(better_play_player(Actual_Player,Row,Discard_Amount,Value)).
+append_play_player(1,_,_,_,_).
+
+%encargado de poner los azulejos en la escalera, en caso de la fila 6, van todos al descarte
+put_tiles_in_row(Actual_Player,6,Color,Amount):-!.
+put_tiles_in_row(Actual_Player,Row,Color,Amount):-
+    get_row_n(Actual_Player,Row,(_,Old_Amount)),
+    New_Amount is Old_Amount+Amount,
+    update_row(Actual_Player, Color, New_Amount, Row).
+
+%encargado tanto de actualizar la cantidad de descarte que tiene el jugador, como de mandar los azulejos al cementerio(simulacion del descarte)
+drop_tiles_general(Actual_Player,Color,0):-!.
+drop_tiles_general(Actual_Player,Color,Discard_Amount):-
+    format("El jugador ~a va a descartar ~a fichas de color ~a",[Actual_Player,Discard_Amount,Color_String]),
+    colors(Color,Color_String),
+    append_tiles_to_cementery(Color_String, Discard_Amount),
+    players(Actual_Player,_,_,_,_,_,_,_,Amount_Old),
+    Total is Amount_Old + Discard_Amount,
+    drop_tiles(Actual_Player, Discard_Amount, Total).
+
+
+%si es una posicion viable dondde poner fichas la agrega a las posiciones y calcula el valor de la jugada
+put_play_player(0,_,_,_,_,_).
+put_play_player(1,Actual_Player,Color, Amount, Actual_Row, NewA):-
+    format("se puede poner en la fila ~a ~n",[Actual_Row]),
+    calculate_play_value(NewA,Value),
+    Empty_Spaces is 0-NewA,
+    append_play_player(1,Value,Actual_Row,Actual_Player,Empty_Spaces).
+
+    % better_play_player(Actual_Player, Better_Actual_Row, _, Better_Actual_Value),
+
+%entre todas las filas en que un jugador puede poner un color selecciona la mas conveniente (la de mayor Value) y devuelve la cantidad de fichas que se descartan
+choose_row_to_put_tiles(0,Actual_Player,_,_,Row,Discard_Amount):-!,
+    better_play_player(Actual_Player,Row,Discard_Amount,_).
+choose_row_to_put_tiles(Actual_Row,Actual_Player,Color,Amount,Row,Discard_Amount):-
+    can_set_tiles_in_row(Actual_Player,Color, Amount, Actual_Row, NewA),% NewA es descartes y -espacios vacios
+    % format("sali de can set tiles con newA ~a, Actual Row ~a ~n",[NewA,Actual_Row]),
+    dynamic_bool(Can_set_in_that_row),
+    put_play_player(Can_set_in_that_row,Actual_Player,Color, Amount, Actual_Row, NewA),
+    Actual_Row1 is Actual_Row-1,
+    choose_row_to_put_tiles(Actual_Row1,Actual_Player,Color,Amount,Row,Discard_Amount).
+
+
+%el jugador actual toma el color Color de la fabrica Factories_number y coloca los azulejos en su escalera
+play(Actual_Player,Factories_number,Color):-
+    colors(Color,Color_String),
+    plays(Factories_number,Color_String,Amount),
+    update_plays(Factories_number,Color_String),
+    % print("sali de update plays ~n"),
+    Drop_value is 0-Amount,
+    assert(better_play_player(Actual_Player,6,Amount,Drop_value)),%en caso de que no se pueda colocar en ninguna fila entonces se colocan todas las baldosas en el descarte
+    choose_row_to_put_tiles(5,Actual_Player,Color,Amount,Row,Discard_Amount),
+    format("El jugador ~a toma ~a fichas de color ~a de la fabrica ~a y las coloca en su fila ~a ~n",[Actual_Player,Amount,Color_String,Factories_number,Row]),
+    put_tiles_in_row(Actual_Player,Row,Color,Amount),
+    drop_tiles_general(Actual_Player,Color,Discard_Amount).
+
+
+%comprueba si no quedan jugadas por tomar (plays) esta vacio,  devuelve 0 si se acabo la ronda devuelve un entero en otro caso
 end_round(End):-
     plays(10,'total',Total),
     End=Total.
-    
+%##############################################-End Parte Esencial del Juego-########################################################################
 
+%#############################################-Crear cada parte necesaria en el juego-###############################################################
 % lugar donde se van las fichas al ser descartadas de los tableros de los jugadores
 create_cementery():-
     retractall(cementery(_,_)),
@@ -112,15 +237,25 @@ create_center():-
 
 
 % rellena la bolsa cuando se acaban las fichas en esta
-refill_bag():-
-    cementery(CementeryColor,CementeryColorCount),
-    bag(BagColor,BagColorCount),
-    BagColor=:=CementeryColor,
-    retract(cementery(CementeryColor, CementeryColorCount)),
-    retract(bag(BagColor, BagColorCount)),
-    assert(cementery(CementeryColor,0)),
+refill_bag():-refill_bag_per_color(5).
+% rellena la bolsa por cada uno de los colores
+refill_bag_per_color(0):-!.
+refill_bag_per_color(ColorInt):-
+    colors(ColorInt,Color),
+    cementery(Color,CementeryColorCount),
+    bag(Color,BagColorCount),
+    % BagColor=:=CementeryColor,
+    retract(cementery(Color, CementeryColorCount)),
+    retract(bag(Color, BagColorCount)),
+    assert(cementery(Color,0)),
     BagColorCountNew is BagColorCount+CementeryColorCount,
-    assert(bag(BagColor,BagColorCountNew)).
+    bag('total',Total),
+    retract(bag('total',Total)),
+    NewTotal is Total+CementeryColorCount,
+    assert(bag('total',NewTotal)),
+    assert(bag(Color,BagColorCountNew)),
+    Color_Int_New is ColorInt-1,
+    refill_bag_per_color(Color_Int_New).
 
 
 % la bolsa es de la forma (color,cantidad de azulejos de ese color que tiene) y tiene un campoo en el que dice la cantidad total de azulejos que hay en la bolsa(total)
@@ -212,4 +347,117 @@ fill_that_factory(Factory_number,N):-
     append_tile_to_factory(Factory_number,ColorString),    
     rest_n_color_c_to_bag(1,ColorString),
     fill_that_factory(Factory_number,Count1).
+
+%#############################################-End Crear cada parte necesaria en el juego-##############################################################
+
+%##############################################-Parte de final de Ronda-######################################################################################
+
+%vacia el escalon n de la escalera de player y manda n-1 azulejos al cementerio
+empty_n_row_of_player(Player,Row):-
+    get_row_n(P, Row, Result),    
+    update_row(Player, 0, 0, Row),
+    Extra is Row-1,
+    append_tiles_to_cementery(Color, Extra).
+
+% si esta llena una fila de la esscalera, encargado de colocar un azulejo en el muro de un jugador despues de que haya completado una fila de ese color
+% put_tile_in_wall(0,_,_,_):-!.
+put_tile_in_wall(0,Player,Row,Color):-
+    players(Player,_,_,_,_,_,_,Matrix,_),
+    find_col(Color,Row,Column),
+    insert_tile(Row, Column, Matrix, Color),
+    calculate_score(Row,Column, Matrix, Score_to_Add),
+    empty_n_row_of_player(Player,Row),
+    add_score(Player, Score_to_Add).
+
+%chequea en cada escalon de la escalera si se ha completado y lo manda entonces a 
+check_every_row(0,Actual_Player,Factories_number):-!.
+check_every_row(Position,Actual_Player,Factories_number):-
+    get_row_n(Actual_Player,Position,(Color,Amount)),
+    Full is Position-Amount,
+    put_tile_in_wall(Full,Actual_Player,Position,Color),
+    Position1 is Position-1,
+    check_every_row(Position1,Actual_Player,Factories_number).
+
+
+
+%##############################################-End Parte de final de Ronda-#####################################################################################
+
+%###############################################-Parte del final del juego-#####################################################################
+
+
+%comprueba si el jugador completo alguna fila 
+player_filled(0,Players_number,End):-!,
+    Players_number1 is Players_number-1,
+    player_fill_row(Players_number,End).
+player_filled(N,Players_number,End):-End is 1.
+
+
+%encargado de comprobar si alguno de los jugadores completo una fila para terminar el juego
+player_fill_row(0,End):-!, End is 0.
+player_fill_row(Players_number,End):-
+    players(Players_number,_,_,_,_,_,_,Matrix,_),
+    row_is_filled(1, Matrix),
+    dynamic_bool(dynamic_bool1),
+    row_is_filled(2, Matrix),
+    dynamic_bool(dynamic_bool2),
+    row_is_filled(3, Matrix),
+    dynamic_bool(dynamic_bool3),
+    row_is_filled(4, Matrix),
+    dynamic_bool(dynamic_bool4),
+    row_is_filled(5, Matrix),
+    dynamic_bool(dynamic_bool5),
+    Player_filled is dynamic_bool1 + dynamic_bool2 + dynamic_bool3 + dynamic_bool4 + dynamic_bool5,%es 0 si ninguna fila se ha llenad0
+    player_filled(Player_filled,Players_number,End).
+
+
+%si la cantidad de fichas que se requieren para rellenar las fabricas es menor que la cantidad que hay actualmente en la bolsa, esta se rellena con las fichas del cementerio
+refill_bag_from_cementery(N):- N < 0,!.
+refill_bag_from_cementery(N):- refill_bag().
+
+%devuelve 1 si no quedan suficientes fichas para rellenar las fabricas y 0 en caso contrario
+sufficient_tiles(New_Need_refill, End):- New_Need_refill < 0,!,End is 1.
+sufficient_tiles(New_Need_refill, End):- End is 0.
+
+%encargado de revisar si en la bolsa no quedan suficientes azulejos, si es el caso pasa los del cementerio a la bolsa y si siguen siendo insuficientes
+%el juego se da por terminado (end es 1 si no alcanzan los azulejos)
+tiles_insufficient(Factories_number,End):-
+    bag('total',Total),
+    Tiles_need is Factories_number * 4,
+    Need_refill is Total - Tiles_need,
+    refill_bag_from_cementery(Need_refill),
+    bag('total',New_Total),
+    New_Need_refill is New_Total - Tiles_need,
+    sufficient_tiles(New_Need_refill, End).
+
+
+%por cada uno de los jugadores busca la cantidad de diagonales, filas y columnas completadas para sumar a su puntuacion 
+actualize_score_end_game_per_player(0):-!.
+actualize_score_end_game_per_player(Player):-
+    players(Player,_,_,_,_,_,_,Matrix,_),
+    calculate_row_col_diag_filled_score(Matrix, Gained_Score),
+    add_score(Player, Gained_Score),
+    Player1 is Player-1,
+    actualize_score_end_game_per_player(Player1).
+
+
+%se llama con 0 o 1 como primer argumento donde 1 significa que el juego ha acabado y 0 que no
+%se encarga de mandar a contar la cantidad de diagonales, filas y columnas completadas para sumar a la puntuacion de cada jugador
+end_game(0,_):-!.
+end_game(N,Players_number):-
+    actualize_score_end_game_per_player(Players_number).
+
+%###############################################-End Parte del final del juego-#####################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
 
