@@ -54,9 +54,12 @@ play_to_end_round(N,Actual_Player,Players_number):-
 %tercera seccion de la ronda en donde se colocan los azulejos de las escaleras de los jugadores en sus mosaicos y se suman las puntuaciones
 %va por cada jugador y al final comprueba que hayan suficientes azulejos en la bolsa, de no haberlos pasa los del cementerio a la bolsa y de no alcanzar
 %se da por terminado el juego
-end_of_round(0,Factories_number):-!.
-end_of_round(Players_number,Factories_number):-
-    check_every_row(5,Players_number,Factories_number),
+end_of_round(0):-!.
+end_of_round(Players_number):-      
+    print_player_details(Players_number),
+    check_every_row(5,Players_number),
+    print_player_details(Players_number),
+
     Players_number1 is Players_number-1,
     % % Dada una matriz M inserta en la posicion (R,C) la loseta de color Tile
     % % R -> Fila
@@ -64,7 +67,7 @@ end_of_round(Players_number,Factories_number):-
     % % M -> Matriz
     % % V -> Valor ubicado en la posicion (R,C) de la matriz M
     % insert_tile(R, C, M, Tile),
-    end_of_round(Players_number1,Factories_number).
+    end_of_round(Players_number1).
 
 
 
@@ -87,8 +90,9 @@ round(Players_number,Factories_number):-
     create_plays(Factories_number),
     %aqui buscar el primer jugador de esta ronda
 
-    play_to_end_round(1,Actual_Player,Players_number).
-    end_of_round(Players_number,Factories_number).
+    play_to_end_round(1,Actual_Player,Players_number),
+
+    end_of_round(Players_number).
     % comprobate_end_game(Players_number).
 
 

@@ -264,9 +264,9 @@ update_dropped_tiles(P, D):-
 % P -> Inndice del jugador
 % D1 -> Cantidad de fichas que ha descartado luego de descartar esta ultima
 drop_tile(P, D1) :-
-    players(P, _, D, _,_,_,_,_,_),
-    D1 =\= 0,
-    !.
+    % players(P, _, D, _,_,_,_,_,_),
+    % D1 =\= 0,
+    % !.
     players(P, _, _, _,_,_,_,_,D),
     D1 is D + 1,
     update_dropped_tiles(P, D1),
@@ -295,6 +295,17 @@ drop_tiles(P, N, D1) :-
 update_matrix(P, M):-
     retract(players(P, Score,R1, R2,R3,R4,R5, _, D)),
     assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
+
+
+print_player_details(Player_number):-
+    players(Player_number, S, (C1, A1), (C2, A2), (C3, A3), (C4, A4), (C5, A5), M, D),
+    colors(C1, C1_str),
+    colors(C2, C2_str),
+    colors(C3, C3_str),
+    colors(C4, C4_str),
+    colors(C5, C5_str),
+    format("************* Informacion del Jugador numero: ~a **************~n  Puntuacion: ~a          Fichas Descartadas: ~a ~n   Escalera ~n  R1      Color: ~a  Cantidad: ~a~n  R2      Color: ~a  Cantidad: ~a~n   R3      Color: ~a  Cantidad: ~a~n   R4      Color: ~a  Cantidad: ~a~n   R5      Color: ~a  Cantidad: ~a~n      Matriz ~n", [Players_number, D, C1_str, A1, C2_str, A2, C3_str, A3, C4_str, A4, C5_str, A5]),
+    print(M).
 
 kk:-
     create_players(2),

@@ -374,5 +374,6 @@ calculate_row_col_diag_filled_score(W, S):-
     calculate_rows_filled_amount_score(W, S1),
     calculate_columns_filled_amount_score(W, S2),
     calculate_colors_filled_amount_score(W, S3),
-    S is S1 + S2 + S3.
+    S is (S1*2) + (S2*7) + (S3*10).
+
 %################################################# Comprobando Filas, columnas y diagonales ############################################

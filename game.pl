@@ -186,6 +186,16 @@ put_tiles_in_row(Actual_Player,Row,Color,Amount):-
     New_Amount is Old_Amount+Amount,
     update_row(Actual_Player, Color, New_Amount, Row).
 
+%printea el cementerio
+print_cementery(0):-!.
+print_cementery(N):-
+    colors(N, N_str),
+    cementery(N_str, A),
+
+    format("Color ~a Cantidad: ~a ~n", [N_str, A]),
+    N1 is N-1,
+    print_cementery(N1).
+
 %encargado tanto de actualizar la cantidad de descarte que tiene el jugador, como de mandar los azulejos al cementerio(simulacion del descarte)
 drop_tiles_general(Actual_Player,Color,Discard_Amount):-Discard_Amount=<0,!.
 drop_tiles_general(Actual_Player,Color,Discard_Amount):-
@@ -194,7 +204,12 @@ drop_tiles_general(Actual_Player,Color,Discard_Amount):-
     append_tiles_to_cementery(Color_String, Discard_Amount),
     players(Actual_Player,_,_,_,_,_,_,_,Amount_Old),
     Total is Amount_Old + Discard_Amount,
-    drop_tiles(Actual_Player, Discard_Amount, Total).
+    update_dropped_tiles(Actual_Player, Total),    
+    format("~n Cementerio ~n"),
+    print_cementery(5).
+   
+    
+    % drop_tiles(Actual_Player, Discard_Amount, Total).
 
 
 %si es una posicion viable dondde poner fichas la agrega a las posiciones y calcula el valor de la jugada
@@ -392,6 +407,7 @@ empty_n_row_of_player(Player,Row):-
 
 % si esta llena una fila de la esscalera, encargado de colocar un azulejo en el muro de un jugador despues de que haya completado una fila de ese color
 % put_tile_in_wall(0,_,_,_):-!.
+
 put_tile_in_wall(0,Player,Row,Color):-
     players(Player,_,_,_,_,_,_,Matrix,_),
     find_col(Color,Row,Column),
@@ -399,15 +415,16 @@ put_tile_in_wall(0,Player,Row,Color):-
     calculate_score(Row,Column, Matrix, Score_to_Add),
     empty_n_row_of_player(Player,Row),
     add_score(Player, Score_to_Add).
+put_tile_in_wall(N,_,_,_).
 
 %chequea en cada escalon de la escalera si se ha completado y lo manda entonces a 
-check_every_row(0,Actual_Player,Factories_number):-!.
-check_every_row(Position,Actual_Player,Factories_number):-
+check_every_row(0,Actual_Player):-!.
+check_every_row(Position,Actual_Player):-
     get_row_n(Actual_Player,Position,(Color,Amount)),
     Full is Position-Amount,
     put_tile_in_wall(Full,Actual_Player,Position,Color),
     Position1 is Position-1,
-    check_every_row(Position1,Actual_Player,Factories_number).
+    check_every_row(Position1,Actual_Player).
 
 
 
