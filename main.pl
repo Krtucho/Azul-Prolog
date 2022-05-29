@@ -27,8 +27,9 @@ fill_factories(Factories_number):-
 
 %comprueba si el actual es el primer jugador en tomar algo del centro para que sea el primer jugador de la proxima ronda
 comprobate_first_player(0,Actual_Player):-
-    not(first_player(F)),
-    assert(first_player(Actual_Player)),
+    not(first_player(_)),
+    % assert(first_player(Actual_Player)),
+    update_first_player(Actual_Player),
     drop_tiles(Actual_Player, 1, _).    
 comprobate_first_player(_,_).
 
