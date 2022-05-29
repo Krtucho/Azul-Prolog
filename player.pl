@@ -33,7 +33,7 @@ update_first_player(P):-
 create_player(N):-
     assert(players(N, 0, (0,0), (0,0), (0,0), (0,0), (0,0), 
     [
-        [1,1,1,1,1],
+        [0,0,0,0,0],
         [0,0,0,0,0],
         [0,0,0,0,0],
         [0,0,0,0,0],
@@ -187,7 +187,7 @@ can_set_tiles_in_row(P,C, A, 2, NewA).
 % Lo mismo que el anterior, pero Row=3
 % Row = 3
 can_set_tiles_in_row(P,C, A, 3, NewA):-
-    players(P, _, _,_,R3,  _, _, W, _),
+    players(P, _, _,_,R3, _, _, W, _),
     (C1,A1) = R3,
     set_dynamic_bool_false,
     not(color_in_row(C, 3, W, R)), % El color no se encuentra en la fila del Muro
@@ -203,7 +203,7 @@ can_set_tiles_in_row(P,C, A, 3, NewA).
 % Lo mismo que el anterior, pero Row=4
 % Row = 4
 can_set_tiles_in_row(P,C, A, 4, NewA):-
-    players(P, _, _,_,_, R4, _, _, _),
+    players(P, _, _,_,_, R4, _, W, _),
     (C1,A1) = R4,
     set_dynamic_bool_false,
     not(color_in_row(C, 4, W, R)), % El color no se encuentra en la fila del Muro
@@ -220,7 +220,7 @@ can_set_tiles_in_row(P,C, A, 4, NewA).
 % Lo mismo que el anterior, pero Row=5
 % Row = 5
 can_set_tiles_in_row(P,C, A, 5, NewA):-
-    players(P, _, _,_,_, _, R5, _, _),
+    players(P, _, _,_,_, _, R5, W, _),
     (C1,A1) = R5,
     set_dynamic_bool_false,
     not(color_in_row(C, 5, W, R)), % El color no se encuentra en la fila del Muro

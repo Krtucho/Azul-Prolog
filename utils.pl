@@ -48,6 +48,9 @@ concatList([A|X], Y, [A|Z]) :-
 % V -> 1st value found
 % VT -> nth value found
 get_values([], _, []).
+get_values([[R, C]], M, [V]):-
+    nth0(R, M, Row),
+    nth0(C, Row, V).
 get_values([[R, C]| T], M, [V|VT]) :-
     nth0(R, M, Row),
     nth0(C, Row, V),

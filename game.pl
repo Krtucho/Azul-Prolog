@@ -112,7 +112,7 @@ send_to_center(Factory_number):-
 %en esta lista en donde estan todas las unificaciones de las jugadas de una fabrica, se envian todas al centro
 send_list_to_center([]).
 send_list_to_center([(Factory_number,Color,Count)|Plays_In_Factory]):-    
-    format("Quitando el color ~a con cantidad ~a ~n",[Color,Count]),
+    % format("Quitando el color ~a con cantidad ~a ~n",[Color,Count]),
     % plays(10,'total',Total),
     % retract(plays(10,'total',Total)),
     retract(plays(Factory_number,Color,Count)),
@@ -161,11 +161,12 @@ put_tiles_in_row(Actual_Player,Row,Color,Amount):-
     New_Amount is Old_Amount+Amount,
     update_row(Actual_Player, Color, New_Amount, Row).
 
-%encargado de tanto actualizar la cantidad de descarte que tiene el jugador  como de mandar los azulejos al cementerio(simulacion del descarte)
+%encargado tanto de actualizar la cantidad de descarte que tiene el jugador, como de mandar los azulejos al cementerio(simulacion del descarte)
 drop_tiles_general(Actual_Player,Color,0):-!.
 drop_tiles_general(Actual_Player,Color,Discard_Amount):-
-    format("El jugador ~a va a descartar ~a fichas de color ~a",[Actual_Player,Discard_Amount,Color]),
-    append_tiles_to_cementery(Color, Discard_Amount),
+    format("El jugador ~a va a descartar ~a fichas de color ~a",[Actual_Player,Discard_Amount,Color_String]),
+    colors(Color,Color_String),
+    append_tiles_to_cementery(Color_String, Discard_Amount),
     players(Actual_Player,_,_,_,_,_,_,_,Amount_Old),
     Total is Amount_Old + Discard_Amount,
     drop_tiles(Actual_Player, Discard_Amount, Total).
@@ -195,14 +196,14 @@ choose_row_to_put_tiles(Actual_Row,Actual_Player,Color,Amount,Row,Discard_Amount
 
 %el jugador actual toma el color Color de la fabrica Factories_number y coloca los azulejos en su escalera
 play(Actual_Player,Factories_number,Color):-
-    % colors(Color,Color_String),
-    plays(Factories_number,Color,Amount),
-    update_plays(Factories_number,Color),
+    colors(Color,Color_String),
+    plays(Factories_number,Color_String,Amount),
+    update_plays(Factories_number,Color_String),
     % print("sali de update plays ~n"),
     Drop_value is 0-Amount,
     assert(better_play_player(Actual_Player,6,Amount,Drop_value)),%en caso de que no se pueda colocar en ninguna fila entonces se colocan todas las baldosas en el descarte
     choose_row_to_put_tiles(5,Actual_Player,Color,Amount,Row,Discard_Amount),
-    format("El jugador ~a toma ~a fichas de color ~a de la fabrica ~a y las coloca en su fila ~a ~n",[Actual_Player,Amount,Color,Factories_number,Row]),
+    format("El jugador ~a toma ~a fichas de color ~a de la fabrica ~a y las coloca en su fila ~a ~n",[Actual_Player,Amount,Color_String,Factories_number,Row]),
     put_tiles_in_row(Actual_Player,Row,Color,Amount),
     drop_tiles_general(Actual_Player,Color,Discard_Amount).
 

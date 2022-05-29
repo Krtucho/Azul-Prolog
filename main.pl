@@ -37,8 +37,8 @@ comprobate_first_player(_,_).
 %se le pasa el jugador actual 
 play_to_end_round(0,Actual_Player,Players_number):-!.
 play_to_end_round(N,Actual_Player,Players_number):-
-    choose_play(Factories_number,Color),
-    % colors(Color,Color_String),
+    choose_play(Factories_number,Color_String),
+    colors(Color,Color_String),
     comprobate_first_player(Factories_number,Actual_Player),    
     % update_plays(Factories_number,Color),
     play(Actual_Player,Factories_number,Color),
@@ -57,12 +57,12 @@ end_of_round(0,Factories_number):-!.
 end_of_round(Players_number,Factories_number):-
     check_every_row(5,Players_number,Factories_number),
     Players_number1 is Players_number-1,
-    % Dada una matriz M inserta en la posicion (R,C) la loseta de color Tile
-    % R -> Fila
-    % C -> Columna
-    % M -> Matriz
-    % V -> Valor ubicado en la posicion (R,C) de la matriz M
-    insert_tile(R, C, M, Tile),
+    % % Dada una matriz M inserta en la posicion (R,C) la loseta de color Tile
+    % % R -> Fila
+    % % C -> Columna
+    % % M -> Matriz
+    % % V -> Valor ubicado en la posicion (R,C) de la matriz M
+    % insert_tile(R, C, M, Tile),
     end_of_round(Players_number1,Factories_number).
 
 
@@ -102,18 +102,18 @@ start_game(Players_number):-
 
 
 start:-
-    % start_game(2).
-    factories_per_player(Players_number,Factories_number),
-    inicialize_game(Factories_number),
-    assert(first_player(1)),
+    start_game(2).
+    % factories_per_player(Players_number,Factories_number),
+    % inicialize_game(Factories_number),
+    % assert(first_player(1)),
 
-    first_player(Actual_Player),
-    retract(first_player(Actual_Player)),
-    fill_factories(Factories_number),
-    create_players(Players_number),
-    create_plays(Factories_number),
+    % first_player(Actual_Player),
+    % retract(first_player(Actual_Player)),
+    % fill_factories(Factories_number),
+    % create_players(Players_number),
+    % create_plays(Factories_number),
 
-    play_to_end_round(1,Actual_Player,Players_number).
+    % play_to_end_round(1,Actual_Player,Players_number).
 
 
 
