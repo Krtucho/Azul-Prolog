@@ -78,7 +78,7 @@ choose_play(Factory_number,Color):-
     findall((Factory_number,Color),(plays(Factory_number,Color,_),not_total(Factory_number)),Factories),
     format("~n"),
     print(Factories),
-    random(1,Total,Random),
+    random(0,Total,Random),
     format("~n Random:~a ~n",[Random]),
     search_pos_n_on_plays(Random,Factory_number,Color,Factories),
     format("Se selecciono la jugada ~a, ~a ~n",[Factory_number,Color]).
@@ -363,12 +363,15 @@ rest_n_color_c_to_bag(N,C):-
 
 
 %pone 4 azulejos en la fabrica de numero factory_number
-fill_that_factory(Factory_number,0):-!.    
+fill_that_factory(Factory_number,0):-!,
+    factory(Factory_number,Tiles),
+    format("~n Fabrica ~a: ",[Factory_number]),
+    print(Tiles).    
 fill_that_factory(Factory_number,N):-
     Count1 is N-1,
     bag('total',Len),
-    % Len1 is Len + 1,
-    random(0,Len,Random),
+    %Len1 is Len + 1,
+    random(1,Len,Random),
     search_pos_n_on_bag(Random,0,1,Color),
     colors(Color,ColorString),
     append_tile_to_factory(Factory_number,ColorString),    
