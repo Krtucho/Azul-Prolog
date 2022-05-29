@@ -21,8 +21,8 @@
 % R5 -> Piso 5 de la escalera  _ _ _ _ _
 % M -> Mosaico o Matriz de la derecha o Muro
 % D -> Cantidad de Fichas descartadas(Dropped Tiles)
-:- dynamic players/9, 
-    first_player/1. % Jugador que comenzo jugando esta ronda(Tenia la ficha 1)
+:- dynamic players/9.
+:- dynamic first_player/1. % Jugador que comenzo jugando esta ronda(Tenia la ficha 1)
 
 update_first_player(P):-
     assert(first_player(_)),
@@ -159,7 +159,7 @@ can_set_tiles_in_row(P,C, A, 1, NewA):-
     % R =:= 0,
     % not(R), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 = 0; C1 = C),
+    (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,
@@ -176,7 +176,7 @@ can_set_tiles_in_row(P,C, A, 2, NewA):-
     set_dynamic_bool_false,
     not(color_in_row(C, 2, W, R)), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 = 0; C1 = C),
+    (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,
@@ -192,7 +192,7 @@ can_set_tiles_in_row(P,C, A, 3, NewA):-
     set_dynamic_bool_false,
     not(color_in_row(C, 3, W, R)), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 = 0; C1 = C),
+    (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,
@@ -208,7 +208,7 @@ can_set_tiles_in_row(P,C, A, 4, NewA):-
     set_dynamic_bool_false,
     not(color_in_row(C, 4, W, R)), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 = 0; C1 = C),
+    (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,
@@ -225,7 +225,7 @@ can_set_tiles_in_row(P,C, A, 5, NewA):-
     set_dynamic_bool_false,
     not(color_in_row(C, 5, W, R)), % El color no se encuentra en la fila del Muro
     format("~a ~a ~n", [C1, A1]),
-    (C1 = 0; C1 = C),
+    (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
     set_dynamic_bool_true,

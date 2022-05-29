@@ -59,7 +59,7 @@ append_play(Factories_number,Color,Count):-
     assert(plays(Factories_number,Color,Count1)).
 
 %se le pasa la lista para encontrar el elemento N
-search_pos_n_on_plays(0,Factory_number,Color,[(X,Y)|_]):-!,
+search_pos_n_on_plays(1,Factory_number,Color,[(X,Y)|_]):-!,
     % format("~n el seleccionado es ~a ~a ~n",[X,Y]),
     Color = Y,
     Factory_number = X.
@@ -74,10 +74,14 @@ not_total(N):- not(N=:=10).
 %de todas las jugadas posibles, el jugador escoge una random (o sea devuelve el numero de la fabrica y el color)
 choose_play(Factory_number,Color):-    
     plays(10,'total',Total),
-    findall((Factory_number,Color),(plays(Factory_number,Color,Cant),not_total(Factory_number)),Factories),
+    format("Total:~a ~n",[Total]),
+    findall((Factory_number,Color),(plays(Factory_number,Color,_),not_total(Factory_number)),Factories),
+    format("~n"),
+    print(Factories),
     random(1,Total,Random),
-    search_pos_n_on_plays(Random,Factory_number,Color,Factories).
-
+    format("~n Random:~a ~n",[Random]),
+    search_pos_n_on_plays(Random,Factory_number,Color,Factories),
+    format("Se selecciono la jugada ~a, ~a ~n",[Factory_number,Color]).
 
 
 % ###############################################-End Parte de Jugadas-########################################################################
@@ -108,14 +112,26 @@ append_tiles_to_center(Color,Count):-
 send_to_center(Factory_number):-
     % plays(Factory_number,Color,Count),       
     findall((Factory_number,Color,Count), plays(Factory_number,Color,Count), Plays_In_Factory),
+    format("Enviadas al centro: ",[]),
+    print(Plays_In_Factory),
     send_list_to_center(Plays_In_Factory).
+
 %en esta lista en donde estan todas las unificaciones de las jugadas de una fabrica, se envian todas al centro
 send_list_to_center([]).
 send_list_to_center([(Factory_number,Color,Count)|Plays_In_Factory]):-    
     % format("Quitando el color ~a con cantidad ~a ~n",[Color,Count]),
     % plays(10,'total',Total),
     % retract(plays(10,'total',Total)),
+    format("~n Enviando al centro ~a ~a ~a ~n",[Factory_number,Color,Count]),
     retract(plays(Factory_number,Color,Count)),
+    % factory('total',Total_Old),
+    % Total_New is Total_Old-Count,
+    % retract(factory('total',_)),
+    % assert(factory('total',Total_New)),
+    plays(10,'total',Plays_Total_Old),
+    retract(plays(10,'total',Plays_Total_Old)),
+    Plays_Total_New is Plays_Total_Old-1,
+    assert(plays(10,'total',Plays_Total_New)),
     % Total1 is Total-1,
     % assert(plays(10,'total',Total1)),
     append_tiles_to_center(Color,Count),
@@ -124,20 +140,28 @@ send_list_to_center([(Factory_number,Color,Count)|Plays_In_Factory]):-
 
 
 %cuando se realiza una jugada se encarga de quitar esa jugada y enviar el resto de las fichas de esa fabrica al centro
+%si es la fabrica 0 es el centro por lo que no hay que enviar las demas jugadas al centro
+update_plays(0,Color):- !,
+    plays(10,'total',Total_Old),
+    Total_New is Total_Old-1,    
+    retract(plays(10,'total',Total_Old)),
+    assert(plays(10,'total',Total_New)),
+    retract(plays(0,Color,_)).   
+%cuando se realiza una jugada se encarga de quitar esa jugada y enviar el resto de las fichas de esa fabrica al centro
 update_plays(Factory_number,Color):-
     % factory(Factory_number,_),
+    plays(10,'total',Total_Old),
+    Total_New is Total_Old-1,    
+    retract(plays(10,'total',Total_Old)),
+    assert(plays(10,'total',Total_New)),
     retract(plays(Factory_number,Color,_)),    
     % retract(factory(Factory_number,_)),
     send_to_center(Factory_number),
     % print("Sali de Go to center"),
-    retract(factory(Factory_number,_)),
     % factory('total',Total_old),
     % retract(factory('total',Total_Old)),
     % assert(factory('total',Total_New)),
-    plays(10,'total',Total_Old),
-    Total_New is Total_Old-1,
-    retract(plays(10,'total',Total_Old)),
-    assert(plays(10,'total',Total_New)),
+    retract(factory(Factory_number,_)),
     assert(factory(Factory_number,[])).
 
 %calcula el valor que tendra la jugada, de esto depende que sea seleccionada, en el caso que complete una fila se suma dos al descarte y en caso contrario, este valor es el descarte
@@ -162,7 +186,7 @@ put_tiles_in_row(Actual_Player,Row,Color,Amount):-
     update_row(Actual_Player, Color, New_Amount, Row).
 
 %encargado tanto de actualizar la cantidad de descarte que tiene el jugador, como de mandar los azulejos al cementerio(simulacion del descarte)
-drop_tiles_general(Actual_Player,Color,0):-!.
+drop_tiles_general(Actual_Player,Color,Discard_Amount):-Discard_Amount=<0,!.
 drop_tiles_general(Actual_Player,Color,Discard_Amount):-
     format("El jugador ~a va a descartar ~a fichas de color ~a",[Actual_Player,Discard_Amount,Color_String]),
     colors(Color,Color_String),
@@ -177,8 +201,8 @@ put_play_player(0,_,_,_,_,_).
 put_play_player(1,Actual_Player,Color, Amount, Actual_Row, NewA):-
     format("se puede poner en la fila ~a ~n",[Actual_Row]),
     calculate_play_value(NewA,Value),
-    Empty_Spaces is 0-NewA,
-    append_play_player(1,Value,Actual_Row,Actual_Player,Empty_Spaces).
+    % Empty_Spaces is 0-NewA,
+    append_play_player(1,Value,Actual_Row,Actual_Player,NewA).
 
     % better_play_player(Actual_Player, Better_Actual_Row, _, Better_Actual_Value),
 
@@ -190,7 +214,7 @@ choose_row_to_put_tiles(Actual_Row,Actual_Player,Color,Amount,Row,Discard_Amount
     % format("sali de can set tiles con newA ~a, Actual Row ~a ~n",[NewA,Actual_Row]),
     dynamic_bool(Can_set_in_that_row),
     put_play_player(Can_set_in_that_row,Actual_Player,Color, Amount, Actual_Row, NewA),
-    Actual_Row1 is Actual_Row-1,
+    Actual_Row1 is Actual_Row-1,    
     choose_row_to_put_tiles(Actual_Row1,Actual_Player,Color,Amount,Row,Discard_Amount).
 
 
