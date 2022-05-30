@@ -266,7 +266,7 @@ calculate_column_score(R, C, M).
 
 
 calculate_bonus_score:-
-    temp_bool(H,V)
+    temp_bool(H,V),
     H =:= 1,
     V =:= 1,
     retract(temp_score(B)), %    
@@ -299,11 +299,12 @@ cumplen_todos([],_).
 cumplen_todos([X|Y],C):- T=..[C,X], T, cumplen_todos(Y,C).
 
 
-row_is_filled(R, W):-
+row_is_filled(R1, W):-
     % colors(T, T_str),
+    R is R1-1,
     set_dynamic_bool_false,
     get_row(R, W, Full_Row),
-    print(Full_Row),
+    % print(Full_Row),
     % findall(X, nth0(T, Full_Row, X), V),
     cumplen_todos(Full_Row, dif_0),
     set_dynamic_bool_true.

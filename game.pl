@@ -95,7 +95,12 @@ append_tiles_to_cementery(Color, Amount):-
     cementery(Color,Old_Amount),
     retract(cementery(Color,Old_Amount)),
     New_Amount is Old_Amount+Amount,
-    assert(cementery(Color,New_Amount)).
+    assert(cementery(Color,New_Amount)),
+    
+    cementery('total',Old_Total),
+    retract(cementery('total',Old_Total)),
+    New_Total is Old_Total+Amount,    
+    assert(cementery('total',New_Total)).
 
 %coloca Count azulejos de color Color en el Centro del Juego
 append_tiles_to_center(Color,Count):-
@@ -175,6 +180,7 @@ append_play_player(0,_,_,_,_):-!.
 append_play_player(1,Value,Row,Actual_Player,Discard_Amount):-
     better_play_player(Actual_Player,_,_,Better_Actual_Value),
     Value > Better_Actual_Value,
+    !,
     retract(better_play_player(Actual_Player,_,_,Better_Actual_Value)),
     assert(better_play_player(Actual_Player,Row,Discard_Amount,Value)).
 append_play_player(1,_,_,_,_).
@@ -293,7 +299,13 @@ create_center():-
 
 
 % rellena la bolsa cuando se acaban las fichas en esta
-refill_bag():-refill_bag_per_color(5).
+refill_bag():-
+    cementery('total',Total),
+    format("Se va a rellenar la bolsa con ~a azulejos del cementerio. ~n",[Total]),
+    refill_bag_per_color(5),
+    retract(cementery('total',_)),
+    assert(cementery('total',0)).
+
 % rellena la bolsa por cada uno de los colores
 refill_bag_per_color(0):-!.
 refill_bag_per_color(ColorInt):-
@@ -432,7 +444,8 @@ put_tile_in_wall(0,Player,Row,Color):-
     retract(players(Player,S,R1,R2,R3,R4,R5,Matrix,D)),
     assert(players(Player,S,R1,R2,R3,R4,R5,New_Matrix,D)),
     format("Jugador: ~a Fila: ~a Columna: ~a ~n", [Player, Row_Matrix, Column]),
-    calculate_score(Row_Matrix,Column, Matrix, Score_to_Add),
+    % calculate_score(Row_Matrix,Column, Matrix, Score_to_Add),%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Descomentar
+    Score_to_Add is 1,%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%comentar
     print("Matrix"),
     format("~n"),
     print_wall(New_Matrix),
@@ -519,11 +532,37 @@ actualize_score_end_game_per_player(Player):-
     actualize_score_end_game_per_player(Player1).
 
 
+%actualiza el winner segun el jugador que tenga la mayor puntuacion
+select_better_score(Players_number,Score):-
+    winner(Actual_Winner,Actual_Winner_Score),
+    Score > Actual_Winner_Score,
+    !,
+    retract(winner(Actual_Winner,Actual_Winner_Score)),
+    assert(winner(Players_number,Score)).
+select_better_score(_,_).
+
+
+%imprime las puntuaciones
+print_scores(0):-!,
+    winner(Winner,Score),
+    format("El ganador de la partida es el jugador ~a con puntuacion ~a ~n~n",[Winner,Score]),
+    abort.
+print_scores(Players_number):-
+    players(Players_number,Score,_,_,_,_,_,_,_),
+    format("El jugador ~a tiene puntuacion ~a ~n",[Players_number,Score]),
+    select_better_score(Players_number,Score),
+    Player1 is Players_number-1,
+    print_scores(Player1).
+
 %se llama con 0 o 1 como primer argumento donde 1 significa que el juego ha acabado y 0 que no
 %se encarga de mandar a contar la cantidad de diagonales, filas y columnas completadas para sumar a la puntuacion de cada jugador
 end_game(0,_):-!.
 end_game(N,Players_number):-
-    actualize_score_end_game_per_player(Players_number).
+    actualize_score_end_game_per_player(Players_number),
+    format("~nLa partida actual ha terminado.~n"),
+    players(Players_number,Score,_,_,_,_,_,_,_),
+    assert(winner(Players_number,Score)),
+    print_scores(Players_number).
 
 %###############################################-End Parte del final del juego-#####################################################################
 

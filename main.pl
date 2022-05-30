@@ -15,6 +15,7 @@ clear_all:-
     retractall(first_player(_)),
     retractall(players(_,_,_,_,_,_,_,_,_)),
     retractall(temp_score(_)),
+    retractall(winner(_,_)),
     retractall(dynamic_bool(_)).
 
 % primera seccion de la ronda  en donde se rellenan todas las factorias
@@ -93,16 +94,19 @@ new_round(0,Players_number,Factories_number):-
 %desarrollo de una ronda 
 round(Players_number,Factories_number):-
     % print("entro a round   "),
-    format("Se rellenan las fabricas. ~n"),
+    format("Comienza la ronda.~n"),
     bag('total',Total),
-    format("En la bolsa quedan ~a azulejos",[Total]),
+    format("En la bolsa quedan ~a azulejos. ~n",[Total]),
+    format("Se rellenan las fabricas. ~n"),
     first_player(Actual_Player),
-    retract(first_player(Actual_Player)),
-    fill_factories(Factories_number),
+    retract(first_player(Actual_Player)),    
+    fill_factories(Factories_number),    
+    bag('total',Total1),
+    format("~nEn la bolsa quedan ~a azulejos. ~n",[Total1]),
     % print_player_details(1),
     create_plays(Factories_number),
     %aqui buscar el primer jugador de esta ronda
-    format("~n Comienzo de la Fase I: Seleccion de Azulejos. ~n"),
+    format("Comienzo de la Fase I: Seleccion de Azulejos. ~n"),
     play_to_end_round(1,Actual_Player,Players_number),
     format("Se terminaron los azulejos en las fabricas y el centro, momento de la Fase II: Revestir el Muro. ~n"),
     end_of_round(Players_number),

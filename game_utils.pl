@@ -15,6 +15,8 @@
 % % %descarte a donde van las fichas que los jugadores no pueden poner en la escalera durante cada turno 
 % % :-dynamic discard_player/2.
 :-dynamic first_player/1.
+%a la hora de elegir el ganador ayuda a escoger el de mayor puntuacion
+:-dynamic winner/2.
 
 % :-dynamic factories_per_player/2.
 % :-dynamic colors/2.
