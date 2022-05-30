@@ -24,7 +24,8 @@
 game_utils].  
                        
 
-:-dynamic temp_score/1. % Variable dinamica que guarda la puntuacion actual de un jugador que agrega fichas al muro que se esta calculando
+:-dynamic temp_score/1, % Variable dinamica que guarda la puntuacion actual de un jugador que agrega fichas al muro que se esta calculando
+            temp_bool/2.
 
 
 % Obtiene la columna C de la loza de color T en la fila R del muro
@@ -81,6 +82,20 @@ clean_temp_score:-
     retractall(temp_score(_)),
     set_temp_score(1).
 
+set_bonus_score(H,V):-
+    assertz(temp_bool(_)),
+    retractall(temp_bool(_)),
+    asserta(temp_bool(H,V)).
+
+set_bonus_score_H(H):-
+    % assertz(temp_bool(_)),
+    retractall(temp_bool(_,0)),
+    asserta(temp_bool(H,0)).
+
+set_bonus_score_V(V):-
+    % assertz(temp_bool(_)),
+    retractall(temp_bool(H, _)),
+    asserta(temp_bool(H,V)).
 % Dada una matriz M nos dice si la casilla (R,C) de la misma esta vacia y si es posible insertar alguna losa de algun color
 % R -> Fila
 % C -> Columna
@@ -131,7 +146,7 @@ insert_tile(R, C, M, Tile,Mu):-
 % M -> Matriz
 % Return:
 % Void
-calculate_row_score_left(R, C, M):-
+calculate_row_score_left(R, C,  M):-
     CL is C - 1,    % Actualizamos el indice de la columna que se movera a la izqda(ColumnLeft)
 
     CL >= 0,        % Comparamos que se encuentre dentro de los limites de la matriz
@@ -139,13 +154,14 @@ calculate_row_score_left(R, C, M):-
     get_values([[R,CL]], M, [V]),   % Buscando el valor de la casilla acutal de la matriz, asignamos el mismo a la variable V
     V =:= 1,                % Comprobamos que el valor de la casilla en la que estamos situados actualmente tenga 1(contiene una loza en la misma)
 
+    set_bonus_score_H(1),
     retract(temp_score(B)), %    
     B1 is B+1,              % Actualizamos el valor de la cantidad de casillas contiguas que tenian alguna loza colocada
     assert(temp_score(B1)), %
     
     calculate_row_score_left(R, CL, M).
 % Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
-calculate_row_score_left(R, C, M).
+calculate_row_score_left(R, C,  M).
 % Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontalmente(fila) desde esa casilla
 % moviendonos hacia la derecha
 % R -> Fila
@@ -162,6 +178,7 @@ calculate_row_score_right(R,C, M):-
     get_values([[R,CR]], M, [V]),
     V =:= 1,
 
+    set_bonus_score_H(1),
     retract(temp_score(B)),
     B1 is B+1,
     assert(temp_score(B1)),
@@ -179,11 +196,11 @@ calculate_row_score_right(R,C, M).
 % Return:
 % Void
 calculate_row_score(R,C, M):-
-    calculate_row_score_left(R, C, M),
-    calculate_row_score_right(R, C, M),
+    calculate_row_score_left(R, C,  M),
+    calculate_row_score_right(R, C,  M),
     !.
 % Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
-calculate_row_score(R, C, M, S).
+calculate_row_score(R, C,  M).
 
 % Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos verticalmente(columna) desde esa casilla
 % moviendonos hacia arriba
@@ -192,19 +209,20 @@ calculate_row_score(R, C, M, S).
 % M -> Matriz
 % Return:
 % Void
-calculate_column_score_up(R,C, M):-
+calculate_column_score_up(R,C,  M):-
     RU is R - 1,    % Actualizamos el indice de la fila que se movera hacia arriba(RowUp)
 
     RU >= 0,        % Comparamos que se encuentre dentro de los limites de la matriz
     RU =< 4,
-    get_values([[R,RU]], M, [V]),   % Buscando el valor de la casilla acutal de la matriz, asignamos el mismo a la variable V
+    get_values([[RU,C]], M, [V]),   % Buscando el valor de la casilla acutal de la matriz, asignamos el mismo a la variable V
     V =:= 1,                % Comprobamos que el valor de la casilla en la que estamos situados actualmente tenga 1(contiene una loza en la misma)
 
+    set_bonus_score_V(1),
     retract(temp_score(B)), %    
     B1 is B+1,              % Actualizamos el valor de la cantidad de casillas contiguas que tenian alguna loza colocada
     assert(temp_score(B1)), %
 
-    calculate_column_score_up(RU,C, M).
+    calculate_column_score_up(RU,C,  M).
 % Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
 calculate_column_score_up(R,C, M).
 
@@ -216,13 +234,14 @@ calculate_column_score_up(R,C, M).
 % Return:
 % Void
 calculate_column_score_down(R,C, M):-
-    RD is R - 1,    % Actualizamos el indice de la fila que se movera hacia abajo(RowDown)
+    RD is R + 1,    % Actualizamos el indice de la fila que se movera hacia abajo(RowDown)
 
     RD >= 0,        % Comparamos que se encuentre dentro de los limites de la matriz
     RD =< 4,
-    get_values([[R,RD]], M, [V]),   % Buscando el valor de la casilla acutal de la matriz, asignamos el mismo a la variable V
+    get_values([[RD,C]], M, [V]),   % Buscando el valor de la casilla acutal de la matriz, asignamos el mismo a la variable V
     V =:= 1,                % Comprobamos que el valor de la casilla en la que estamos situados actualmente tenga 1(contiene una loza en la misma)
 
+    set_bonus_score_V(1),
     retract(temp_score(B)), %    
     B1 is B+1,              % Actualizamos el valor de la cantidad de casillas contiguas que tenian alguna loza colocada
     assert(temp_score(B1)), %
@@ -245,6 +264,15 @@ calculate_column_score(R,C, M):-
 % Caso para cuando de fail o False no se detenga la ejecucion de la aplicacion.
 calculate_column_score(R, C, M).
 
+
+calculate_bonus_score:-
+    temp_bool(H,V)
+    H =:= 1,
+    V =:= 1,
+    retract(temp_score(B)), %    
+    B1 is B+1,              % Actualizamos el valor de la cantidad de casillas contiguas que tenian alguna loza colocada
+    assert(temp_score(B1)). %
+calculate_bonus_score.
 % Dada una posicion (R,C) en la matriz M determina la puntuacion que se obtiene si nos movemos horizontal(fila) y verticalmente(columna) desde esa casilla
 % R -> Fila
 % C -> Columna
@@ -252,8 +280,11 @@ calculate_column_score(R, C, M).
 % S -> Puntuacion
 calculate_score(R,C, M, S):-
     set_temp_score(1),
-    calculate_row_score(R, C, M),
-    calculate_column_score(R,C, M),
+    set_bonus_score(0,0),
+
+    calculate_row_score(R, C,  M),
+    calculate_column_score(R,C,  M),
+    calculate_bonus_score,
     temp_score(S),
     !.
 
@@ -388,12 +419,12 @@ print_wall(Matrix):-
     nth0(1, Matrix, MR2),
     print(MR2),
     format("~n"),
-    nth0(0, Matrix, MR3),
+    nth0(2, Matrix, MR3),
     print(MR3),
     format("~n"),
-    nth0(1, Matrix, MR4),
+    nth0(3, Matrix, MR4),
     print(MR4),
     format("~n"),
-    nth0(0, Matrix, MR5),
+    nth0(4, Matrix, MR5),
     print(MR5),
     format("~n").

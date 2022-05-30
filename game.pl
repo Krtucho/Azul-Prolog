@@ -431,7 +431,12 @@ put_tile_in_wall(0,Player,Row,Color):-
 
     retract(players(Player,S,R1,R2,R3,R4,R5,Matrix,D)),
     assert(players(Player,S,R1,R2,R3,R4,R5,New_Matrix,D)),
+    format("Jugador: ~a Fila: ~a Columna: ~a ~n", [Player, Row_Matrix, Column]),
     calculate_score(Row_Matrix,Column, Matrix, Score_to_Add),
+    print("Matrix"),
+    format("~n"),
+    print_wall(New_Matrix),
+    format("Puntuacion a annadir: ~a ~n", [Score_to_Add]),
     empty_n_row_of_player(Player,Row),
     add_score(Player, Score_to_Add).
 put_tile_in_wall(N,_,_,_).

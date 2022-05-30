@@ -85,7 +85,6 @@ round(Players_number,Factories_number):-
     first_player(Actual_Player),
     retract(first_player(Actual_Player)),
     fill_factories(Factories_number),
-    create_players(Players_number),
     % print_player_details(1),
     create_plays(Factories_number),
     %aqui buscar el primer jugador de esta ronda
@@ -103,6 +102,7 @@ start_game(Players_number):-
     inicialize_game(Factories_number),
     assert(first_player(1)),
     format("Comienzo del Juego. ~n "),
+    create_players(Players_number),
     round(Players_number,Factories_number).
 
 
