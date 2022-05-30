@@ -52,13 +52,25 @@ play_to_end_round(N,Actual_Player,Players_number):-!,
 
 
 
+%si una puntuacion esta negativa la convierte en 0
+get_really_score(Bad_Score,S_New):- Bad_Score < 0, !, S_New is 0.
+get_really_score(Bad_Score,S_New):- Bad_Score >= 0, S_New is Bad_Score.
+
 %tercera seccion de la ronda en donde se colocan los azulejos de las escaleras de los jugadores en sus mosaicos y se suman las puntuaciones
 %va por cada jugador y al final comprueba que hayan suficientes azulejos en la bolsa, de no haberlos pasa los del cementerio a la bolsa y de no alcanzar
 %se da por terminado el juego
 end_of_round(0):-!.
 end_of_round(Players_number):-      
-    print_player_details(Players_number),
+    format("Antes de aplicar los cambios ~n"),
+    print_player_details(Players_number),    
     check_every_row(5,Players_number),
+    players(Players_number,S_Old,R1,R2,R3,R4,R5,M,D_Old),
+    retract(players(Players_number,S_Old,R1,R2,R3,R4,R5,M,D_Old)),
+    get_negative_score(D_Old,Drop_Score),
+    Bad_Score is S_Old + Drop_Score,
+    get_really_score(Bad_Score,S_New),
+    assert(players(Players_number,S_New,R1,R2,R3,R4,R5,M,0)),
+    format("Despues de aplicar los cambios ~n"),
     print_player_details(Players_number),
     Players_number1 is Players_number-1,
     end_of_round(Players_number1).
@@ -70,8 +82,8 @@ comprobate_end_game(Players_number,Factories_number):-
     player_fill_row(Players_number,End_player),
     tiles_insufficient(Factories_number,End_tiles),
     End_Game is End_player +  End_tiles,
-    new_round(End_Game,Players_number,Factories_number),
-    end_game(End_Game,Players_number).
+    end_game(End_Game,Players_number),
+    new_round(End_Game,Players_number,Factories_number).
 
 new_round(0,Players_number,Factories_number):-
     format("Como no se ha concluido el juego, se comienza una nueva ronda. ~n"),
@@ -82,13 +94,15 @@ new_round(0,Players_number,Factories_number):-
 round(Players_number,Factories_number):-
     % print("entro a round   "),
     format("Se rellenan las fabricas. ~n"),
+    bag('total',Total),
+    format("En la bolsa quedan ~a azulejos",[Total]),
     first_player(Actual_Player),
     retract(first_player(Actual_Player)),
     fill_factories(Factories_number),
     % print_player_details(1),
     create_plays(Factories_number),
     %aqui buscar el primer jugador de esta ronda
-    format("Comienzo de la Fase I: Selección de Azulejos. ~n"),
+    format("~n Comienzo de la Fase I: Seleccion de Azulejos. ~n"),
     play_to_end_round(1,Actual_Player,Players_number),
     format("Se terminaron los azulejos en las fabricas y el centro, momento de la Fase II: Revestir el Muro. ~n"),
     end_of_round(Players_number),

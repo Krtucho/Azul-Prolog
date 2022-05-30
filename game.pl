@@ -400,8 +400,8 @@ fill_that_factory(Factory_number,0):-!,
 fill_that_factory(Factory_number,N):-
     Count1 is N-1,
     bag('total',Len),
-    %Len1 is Len + 1,
-    random(1,Len,Random),
+    Len1 is Len + 1,
+    random(1,Len1,Random),
     search_pos_n_on_bag(Random,0,1,Color),
     colors(Color,ColorString),
     append_tile_to_factory(Factory_number,ColorString),    
@@ -490,7 +490,11 @@ refill_bag_from_cementery(N):-
     refill_bag().
 
 %devuelve 1 si no quedan suficientes fichas para rellenar las fabricas y 0 en caso contrario
-sufficient_tiles(New_Need_refill, End):- New_Need_refill < 0,!,End is 1.
+sufficient_tiles(New_Need_refill, End):- 
+    New_Need_refill < 0,
+    !,
+    format("Quedan menos azulejos de los que se necesitan para rellenar las fabricas, por tanto el juego ha acabado. ~n"),
+    End is 1.
 sufficient_tiles(New_Need_refill, End):- End is 0.
 
 %encargado de revisar si en la bolsa no quedan suficientes azulejos, si es el caso pasa los del cementerio a la bolsa y si siguen siendo insuficientes
