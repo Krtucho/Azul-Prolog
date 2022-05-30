@@ -1,5 +1,5 @@
-:-[utils].
-:-[game_utils].
+% :-[utils].
+% :-[game_utils].
 :-[player].
 
 
@@ -455,7 +455,7 @@ check_every_row(Position,Actual_Player):-
 %comprueba si el jugador completo alguna fila 
 player_filled(0,Players_number,End):-!,
     Players_number1 is Players_number-1,
-    player_fill_row(Players_number,End).
+    player_fill_row(Players_number1,End).
 player_filled(N,Players_number,End):-End is 1.
 
 
@@ -464,22 +464,25 @@ player_fill_row(0,End):-!, End is 0.
 player_fill_row(Players_number,End):-
     players(Players_number,_,_,_,_,_,_,Matrix,_),
     row_is_filled(1, Matrix),
-    dynamic_bool(dynamic_bool1),
+    dynamic_bool(B1),
     row_is_filled(2, Matrix),
-    dynamic_bool(dynamic_bool2),
+    dynamic_bool(B2),
     row_is_filled(3, Matrix),
-    dynamic_bool(dynamic_bool3),
+    dynamic_bool(B3),
     row_is_filled(4, Matrix),
-    dynamic_bool(dynamic_bool4),
+    dynamic_bool(B4),
     row_is_filled(5, Matrix),
-    dynamic_bool(dynamic_bool5),
-    Player_filled is dynamic_bool1 + dynamic_bool2 + dynamic_bool3 + dynamic_bool4 + dynamic_bool5,%es 0 si ninguna fila se ha llenad0
+    dynamic_bool(B5),
+    Player_filled is B1 + B2 + B3 + B4 + B5,%es 0 si ninguna fila se ha llenad0
     player_filled(Player_filled,Players_number,End).
 
 
 %si la cantidad de fichas que se requieren para rellenar las fabricas es menor que la cantidad que hay actualmente en la bolsa, esta se rellena con las fichas del cementerio
-refill_bag_from_cementery(N):- N < 0,!.
-refill_bag_from_cementery(N):- refill_bag().
+refill_bag_from_cementery(N):- N >= 0,!.
+refill_bag_from_cementery(N):- 
+    cementery('total',Total),
+    format("Se van a pasar ~a azulejos del cementerio a la bolsa ~n",[Total]),
+    refill_bag().
 
 %devuelve 1 si no quedan suficientes fichas para rellenar las fabricas y 0 en caso contrario
 sufficient_tiles(New_Need_refill, End):- New_Need_refill < 0,!,End is 1.
@@ -491,7 +494,7 @@ tiles_insufficient(Factories_number,End):-
     bag('total',Total),
     Tiles_need is Factories_number * 4,
     Need_refill is Total - Tiles_need,
-    refill_bag_from_cementery(Need_refill),
+    refill_bag_from_cementery(Need_refill),    
     bag('total',New_Total),
     New_Need_refill is New_Total - Tiles_need,
     sufficient_tiles(New_Need_refill, End).

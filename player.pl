@@ -306,8 +306,11 @@ print_player_details(Player_number):-
     colors(C5, C5_str),
     format("~n Informacion del jugador: ~a ~nPuntuacion: ~a        Fichas Descartadas: ~a  ~nEscalera ~nR1       Color: ~a   Cantidad:~a  ~nR2       Color: ~a   Cantidad:~a  ~nR3       Color: ~a   Cantidad:~a ~nR4       Color: ~a   Cantidad:~a ~nR5       Color: ~a   Cantidad:~a~n Matrix ~n", [Player_number, S, D, C1_str, A1, C2_str, A2, C3_str, A3, C4_str, A4, C5_str, A5]),
     %format(" Informacion del Jugador numero ~a   Puntuacion         Fichas Descartadas     Escalera   R1      Color   Cantidad  R2      Color   Cantidad   R3      Color   Cantidad   R4      Color  Cantidad   R5      Color   Cantidad      Matriz ", [Players_number]),%,S, D, C1_str, A1, C2_str, A2, C3_str, A3, C4_str, A4, C5_str, A5]),
-    print(M),
-    format("~n").
+    % print(M),
+    % format("~n").
+    print_wall(M).
+
+    
 
 kk:-
     create_players(2),

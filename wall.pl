@@ -379,3 +379,21 @@ calculate_row_col_diag_filled_score(W, S):-
     S is (S1*2) + (S2*7) + (S3*10).
 
 %################################################# Comprobando Filas, columnas y diagonales ############################################
+
+
+print_wall(Matrix):-
+    nth0(0, Matrix, MR1),
+    print(MR1),
+    format("~n"),
+    nth0(1, Matrix, MR2),
+    print(MR2),
+    format("~n"),
+    nth0(0, Matrix, MR3),
+    print(MR3),
+    format("~n"),
+    nth0(1, Matrix, MR4),
+    print(MR4),
+    format("~n"),
+    nth0(0, Matrix, MR5),
+    print(MR5),
+    format("~n").
