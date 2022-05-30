@@ -63,6 +63,10 @@ update_mat_rc(Mc,R,C,V,Mu) :-
     nth0(C,Rc,_,Rt),
     nth0(C,Ru,V,Rt),
     nth0(R,Mu,Ru,Mt).
+    % format("~n matriz Mu ~n"),
+    % print(Mu),
+    % format("~n matriz Mt ~n"),
+    % print(Mt).
 
 % Index -> Posicion de la lista a buscar
 % Matrix(Matriz o lista en la que vamos a buscar)

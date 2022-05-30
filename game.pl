@@ -74,15 +74,15 @@ not_total(N):- not(N=:=10).
 %de todas las jugadas posibles, el jugador escoge una random (o sea devuelve el numero de la fabrica y el color)
 choose_play(Factory_number,Color):-    
     plays(10,'total',Total),
-    format("Total:~a ~n",[Total]),
+    % format("Total:~a ~n",[Total]),
     findall((Factory_number,Color),(plays(Factory_number,Color,_),not_total(Factory_number)),Factories),
-    format("~n"),
-    print(Factories),
+    % format("~n"),
+    % print(Factories),
     Total1 is Total+1,
     random(1,Total1,Random),
-    format("~n Random:~a ~n",[Random]),
-    search_pos_n_on_plays(Random,Factory_number,Color,Factories),
-    format("Se selecciono la jugada ~a, ~a ~n",[Factory_number,Color]).
+    % format("~n Random:~a ~n",[Random]),
+    search_pos_n_on_plays(Random,Factory_number,Color,Factories).
+    % format("Se selecciono la jugada ~a, ~a ~n",[Factory_number,Color]).
 
 
 % ###############################################-End Parte de Jugadas-########################################################################
@@ -113,8 +113,8 @@ append_tiles_to_center(Color,Count):-
 send_to_center(Factory_number):-
     % plays(Factory_number,Color,Count),       
     findall((Factory_number,Color,Count), plays(Factory_number,Color,Count), Plays_In_Factory),
-    format("Enviadas al centro: ",[]),
-    print(Plays_In_Factory),
+    % format("Enviadas al centro: ",[]),
+    % print(Plays_In_Factory),
     send_list_to_center(Plays_In_Factory).
 
 %en esta lista en donde estan todas las unificaciones de las jugadas de una fabrica, se envian todas al centro
@@ -123,7 +123,7 @@ send_list_to_center([(Factory_number,Color,Count)|Plays_In_Factory]):-
     % format("Quitando el color ~a con cantidad ~a ~n",[Color,Count]),
     % plays(10,'total',Total),
     % retract(plays(10,'total',Total)),
-    format("~n Enviando al centro ~a ~a ~a ~n",[Factory_number,Color,Count]),
+    % format("~n Enviando al centro ~a ~a ~a ~n",[Factory_number,Color,Count]),
     retract(plays(Factory_number,Color,Count)),
     % factory('total',Total_Old),
     % Total_New is Total_Old-Count,
@@ -179,12 +179,26 @@ append_play_player(1,Value,Row,Actual_Player,Discard_Amount):-
     assert(better_play_player(Actual_Player,Row,Discard_Amount,Value)).
 append_play_player(1,_,_,_,_).
 
+
+%llama update_row con la cantidad correcta de azulejos a poner en la fila
+call_update_row(Difference,Row,Actual_Player,New_Amount, Color):- 
+    Difference < 0,
+    !,
+    update_row(Actual_Player, Color, Row, Row).
+call_update_row(Difference,Row,Actual_Player,New_Amount, Color):- 
+    Difference >=0,
+    !,
+    update_row(Actual_Player, Color, New_Amount, Row).
+
 %encargado de poner los azulejos en la escalera, en caso de la fila 6, van todos al descarte
 put_tiles_in_row(Actual_Player,6,Color,Amount):-!.
 put_tiles_in_row(Actual_Player,Row,Color,Amount):-
     get_row_n(Actual_Player,Row,(_,Old_Amount)),
     New_Amount is Old_Amount+Amount,
-    update_row(Actual_Player, Color, New_Amount, Row).
+    Difference is Row-New_Amount,
+    % update_row(Actual_Player, Color, Difference, Row).
+    call_update_row(Difference,Row,Actual_Player,New_Amount, Color).
+
 
 %printea el cementerio
 print_cementery(0):-!.
@@ -200,13 +214,13 @@ print_cementery(N):-
 drop_tiles_general(Actual_Player,Color,Discard_Amount):-Discard_Amount=<0,!.
 drop_tiles_general(Actual_Player,Color,Discard_Amount):-
     colors(Color,Color_String),
-    format("El jugador ~a va a descartar ~a fichas de color ~a",[Actual_Player,Discard_Amount,Color_String]),
+    % format("El jugador ~a va a descartar ~a fichas de color ~a",[Actual_Player,Discard_Amount,Color_String]),
     append_tiles_to_cementery(Color_String, Discard_Amount),
     players(Actual_Player,_,_,_,_,_,_,_,Amount_Old),
     Total is Amount_Old + Discard_Amount,
-    update_dropped_tiles(Actual_Player, Total),    
-    format("~n Cementerio ~n"),
-    print_cementery(5).
+    update_dropped_tiles(Actual_Player, Total).
+    % format("~n Cementerio ~n"),
+    % print_cementery(5).
    
     
     % drop_tiles(Actual_Player, Discard_Amount, Total).
@@ -216,7 +230,7 @@ drop_tiles_general(Actual_Player,Color,Discard_Amount):-
 put_play_player(0,_,_,_,_,_).
 put_play_player(1,Actual_Player,Color, Amount, Actual_Row, NewA):-
     calculate_play_value(NewA,Value),
-    format("se puede poner en la fila ~a con descarte ~a y valor ~a ~n",[Actual_Row,NewA,Value]),
+    % format("se puede poner en la fila ~a con descarte ~a y valor ~a ~n",[Actual_Row,NewA,Value]),
 
     % Empty_Spaces is 0-NewA,
     append_play_player(1,Value,Actual_Row,Actual_Player,NewA).
@@ -244,8 +258,8 @@ play(Actual_Player,Factories_number,Color):-
     % print("sali de update plays ~n"),
     Drop_value is 0-Amount,
     assert(better_play_player(Actual_Player,6,Amount,Drop_value)),%en caso de que no se pueda colocar en ninguna fila entonces se colocan todas las baldosas en el descarte
-    choose_row_to_put_tiles(5,Actual_Player,Color,Amount,Row,Discard_Amount),
-    format("El jugador ~a toma ~a fichas de color ~a de la fabrica ~a y las coloca en su fila ~a ~n",[Actual_Player,Amount,Color_String,Factories_number,Row]),
+    choose_row_to_put_tiles(5,Actual_Player,Color,Amount,Row,Discard_Amount),    
+    format("El jugador ~a toma ~a azulejos de color ~a de la fabrica ~a, las coloca en su fila ~a y descarta ~a azulejos. ~n",[Actual_Player,Amount,Color_String,Factories_number,Row,Discard_Amount]),
     put_tiles_in_row(Actual_Player,Row,Color,Amount),
     drop_tiles_general(Actual_Player,Color,Discard_Amount).
 
@@ -407,12 +421,17 @@ empty_n_row_of_player(Player,Row):-
 
 % si esta llena una fila de la esscalera, encargado de colocar un azulejo en el muro de un jugador despues de que haya completado una fila de ese color
 % put_tile_in_wall(0,_,_,_):-!.
-
 put_tile_in_wall(0,Player,Row,Color):-
-    players(Player,_,_,_,_,_,_,Matrix,_),
-    find_col(Color,Row,Column),
-    insert_tile(Row, Column, Matrix, Color),
-    calculate_score(Row,Column, Matrix, Score_to_Add),
+    players(Player,S,R1,R2,R3,R4,R5,Matrix,D),
+    Row_Matrix is Row-1,
+    colors(Color,Color_String),    
+
+    find_col(Color_String,Row_Matrix,Column),
+    insert_tile(Row_Matrix, Column, Matrix, 1,New_Matrix),
+
+    retract(players(Player,S,R1,R2,R3,R4,R5,Matrix,D)),
+    assert(players(Player,S,R1,R2,R3,R4,R5,New_Matrix,D)),
+    calculate_score(Row_Matrix,Column, Matrix, Score_to_Add),
     empty_n_row_of_player(Player,Row),
     add_score(Player, Score_to_Add).
 put_tile_in_wall(N,_,_,_).

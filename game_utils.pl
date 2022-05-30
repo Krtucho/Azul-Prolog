@@ -18,6 +18,7 @@
 
 % :-dynamic factories_per_player/2.
 % :-dynamic colors/2.
+colors(0,'nada').
 colors(1,'negro').
 colors(2,'azul').
 colors(3,'amarillo').

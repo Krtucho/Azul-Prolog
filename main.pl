@@ -30,6 +30,7 @@ comprobate_first_player(0,Actual_Player):-
     not(first_player(_)),
     % assert(first_player(Actual_Player)),
     update_first_player(Actual_Player),
+    format("Se establece el jugado ~a como nuevo primer jugador y se queda con la ficha 1. ~n",[Actual_Player]),
     drop_tiles(Actual_Player, 1, _).    
 comprobate_first_player(_,_).
 
@@ -37,7 +38,7 @@ comprobate_first_player(_,_).
 %se le pasa 0 si se acabaron las jugadas posibles y por tanto se acabo la ronda y N>0 significa que no ha acabado
 %se le pasa el jugador actual 
 play_to_end_round(0,Actual_Player,Players_number):-!.
-play_to_end_round(N,Actual_Player,Players_number):-
+play_to_end_round(N,Actual_Player,Players_number):-!,
     choose_play(Factories_number,Color_String),
     colors(Color,Color_String),
     comprobate_first_player(Factories_number,Actual_Player),    
@@ -59,14 +60,7 @@ end_of_round(Players_number):-
     print_player_details(Players_number),
     check_every_row(5,Players_number),
     print_player_details(Players_number),
-
     Players_number1 is Players_number-1,
-    % % Dada una matriz M inserta en la posicion (R,C) la loseta de color Tile
-    % % R -> Fila
-    % % C -> Columna
-    % % M -> Matriz
-    % % V -> Valor ubicado en la posicion (R,C) de la matriz M
-    % insert_tile(R, C, M, Tile),
     end_of_round(Players_number1).
 
 
@@ -76,24 +70,31 @@ comprobate_end_game(Players_number,Factories_number):-
     player_fill_row(Players_number,End_player),
     tiles_insufficient(Factories_number,End_tiles),
     End_Game is End_player +  End_tiles,
+    new_round(End_Game,Players_number,Factories_number),
     end_game(End_Game,Players_number).
 
+new_round(0,Players_number,Factories_number):-
+    format("Como no se ha concluido el juego, se comienza una nueva ronda. ~n"),
+    round(Players_number,Factories_number).
 
 
 %desarrollo de una ronda 
 round(Players_number,Factories_number):-
     % print("entro a round   "),
+    format("Se rellenan las fabricas. ~n"),
     first_player(Actual_Player),
     retract(first_player(Actual_Player)),
     fill_factories(Factories_number),
     create_players(Players_number),
+    % print_player_details(1),
     create_plays(Factories_number),
     %aqui buscar el primer jugador de esta ronda
-
+    format("Comienzo de la Fase I: Selección de Azulejos. ~n"),
     play_to_end_round(1,Actual_Player,Players_number),
-
-    end_of_round(Players_number).
-    % comprobate_end_game(Players_number).
+    format("Se terminaron los azulejos en las fabricas y el centro, momento de la Fase II: Revestir el Muro. ~n"),
+    end_of_round(Players_number),
+    format("Comienzo de la Fase III: Mantenimiento. ~n"),
+    comprobate_end_game(Players_number,Factories_number).
 
 
 
@@ -101,6 +102,7 @@ start_game(Players_number):-
     factories_per_player(Players_number,Factories_number),
     inicialize_game(Factories_number),
     assert(first_player(1)),
+    format("Comienzo del Juego. ~n "),
     round(Players_number,Factories_number).
 
 

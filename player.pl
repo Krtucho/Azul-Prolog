@@ -158,7 +158,7 @@ can_set_tiles_in_row(P,C, A, 1, NewA):-
     % print(R),
     % R =:= 0,
     % not(R), % El color no se encuentra en la fila del Muro
-    format("~a ~a ~n", [C1, A1]),
+    % format("~a ~a ~n", [C1, A1]),
     (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
@@ -175,7 +175,7 @@ can_set_tiles_in_row(P,C, A, 2, NewA):-
     (C1,A1) = R2,
     set_dynamic_bool_false,
     not(color_in_row(C, 2, W, R)), % El color no se encuentra en la fila del Muro
-    format("~a ~a ~n", [C1, A1]),
+    % format("~a ~a ~n", [C1, A1]),
     (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
@@ -191,7 +191,7 @@ can_set_tiles_in_row(P,C, A, 3, NewA):-
     (C1,A1) = R3,
     set_dynamic_bool_false,
     not(color_in_row(C, 3, W, R)), % El color no se encuentra en la fila del Muro
-    format("~a ~a ~n", [C1, A1]),
+    % format("~a ~a ~n", [C1, A1]),
     (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
@@ -207,7 +207,7 @@ can_set_tiles_in_row(P,C, A, 4, NewA):-
     (C1,A1) = R4,
     set_dynamic_bool_false,
     not(color_in_row(C, 4, W, R)), % El color no se encuentra en la fila del Muro
-    format("~a ~a ~n", [C1, A1]),
+    % format("~a ~a ~n", [C1, A1]),
     (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
@@ -224,7 +224,7 @@ can_set_tiles_in_row(P,C, A, 5, NewA):-
     (C1,A1) = R5,
     set_dynamic_bool_false,
     not(color_in_row(C, 5, W, R)), % El color no se encuentra en la fila del Muro
-    format("~a ~a ~n", [C1, A1]),
+    % format("~a ~a ~n", [C1, A1]),
     (C1 =:= 0; C1 =:= C),
     % A + A1 =< 1,
     % format("Se va a poner en true el dynamic bool ~n"),
@@ -258,7 +258,7 @@ get_negative_score_for_player(P, S):-
 % Actualizar cantidad de piezas descartadas
 update_dropped_tiles(P, D):-
     retract(players(P, Score,R1, R2,R3,R4,R5, M, _)),
-    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
+    assert(players(P, Score, R1, R2,R3,R4,R5, M, D)).
 
 % El jugador descarte una ficha
 % P -> Inndice del jugador
@@ -294,7 +294,7 @@ drop_tiles(P, N, D1) :-
 % Actualizar matriz de la derecha(Muro)
 update_matrix(P, M):-
     retract(players(P, Score,R1, R2,R3,R4,R5, _, D)),
-    assert(players(P, S, R1, R2,R3,R4,R5, M, D)).
+    assert(players(P, Score, R1, R2,R3,R4,R5, M, D)).
 
 
 print_player_details(Player_number):-
@@ -304,8 +304,10 @@ print_player_details(Player_number):-
     colors(C3, C3_str),
     colors(C4, C4_str),
     colors(C5, C5_str),
-    format("************* Informacion del Jugador numero: ~a **************~n  Puntuacion: ~a          Fichas Descartadas: ~a ~n   Escalera ~n  R1      Color: ~a  Cantidad: ~a~n  R2      Color: ~a  Cantidad: ~a~n   R3      Color: ~a  Cantidad: ~a~n   R4      Color: ~a  Cantidad: ~a~n   R5      Color: ~a  Cantidad: ~a~n      Matriz ~n", [Players_number, D, C1_str, A1, C2_str, A2, C3_str, A3, C4_str, A4, C5_str, A5]),
-    print(M).
+    format("~n Informacion del jugador: ~a ~nPuntuacion: ~a        Fichas Descartadas: ~a  ~nEscalera ~nR1       Color: ~a   Cantidad:~a  ~nR2       Color: ~a   Cantidad:~a  ~nR3       Color: ~a   Cantidad:~a ~nR4       Color: ~a   Cantidad:~a ~nR5       Color: ~a   Cantidad:~a~n Matrix ~n", [Player_number, S, D, C1_str, A1, C2_str, A2, C3_str, A3, C4_str, A4, C5_str, A5]),
+    %format(" Informacion del Jugador numero ~a   Puntuacion         Fichas Descartadas     Escalera   R1      Color   Cantidad  R2      Color   Cantidad   R3      Color   Cantidad   R4      Color  Cantidad   R5      Color   Cantidad      Matriz ", [Players_number]),%,S, D, C1_str, A1, C2_str, A2, C3_str, A3, C4_str, A4, C5_str, A5]),
+    print(M),
+    format("~n").
 
 kk:-
     create_players(2),

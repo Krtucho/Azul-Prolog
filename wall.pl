@@ -117,8 +117,10 @@ color_in_row(T, R, W, Result):-
 % C -> Columna
 % M -> Matriz
 % V -> Valor ubicado en la posicion (R,C) de la matriz M
-insert_tile(R, C, M, Tile):-
+insert_tile(R, C, M, Tile,Mu):-
     update_mat_rc(M,R,C,Tile,Mu).
+    % format("~n matriz Mu de insert_tile ~n"),
+    % print(Mu).
 
 %################################################# Calculando puntuaciones ############################################
 
