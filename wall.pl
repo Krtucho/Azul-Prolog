@@ -25,7 +25,8 @@ game_utils].
                        
 
 :-dynamic temp_score/1, % Variable dinamica que guarda la puntuacion actual de un jugador que agrega fichas al muro que se esta calculando
-            temp_bool/2.
+            temp_bool_H/1,
+            temp_bool_V/1.
 
 
 % Obtiene la columna C de la loza de color T en la fila R del muro
@@ -83,19 +84,22 @@ clean_temp_score:-
     set_temp_score(1).
 
 set_bonus_score(H,V):-
-    assertz(temp_bool(_)),
-    retractall(temp_bool(_)),
-    asserta(temp_bool(H,V)).
+    assert(temp_bool_H(_)),
+    retractall(temp_bool_H(_)),
+    assert(temp_bool_V(_)),
+    retractall(temp_bool_V(_)),
+    assert(temp_bool_V(V)),
+    assert(temp_bool_H(H)).
 
 set_bonus_score_H(H):-
     % assertz(temp_bool(_)),
-    retractall(temp_bool(_,0)),
-    asserta(temp_bool(H,0)).
+    retractall(temp_bool_H(_)),
+    assert(temp_bool_H(H)).
 
 set_bonus_score_V(V):-
     % assertz(temp_bool(_)),
-    retractall(temp_bool(H, _)),
-    asserta(temp_bool(H,V)).
+    retractall(temp_bool_V(_)),
+    assert(temp_bool_V(V)).
 % Dada una matriz M nos dice si la casilla (R,C) de la misma esta vacia y si es posible insertar alguna losa de algun color
 % R -> Fila
 % C -> Columna
@@ -266,7 +270,8 @@ calculate_column_score(R, C, M).
 
 
 calculate_bonus_score:-
-    temp_bool(H,V),
+    temp_bool_H(H),
+    temp_bool_V(V),
     H =:= 1,
     V =:= 1,
     retract(temp_score(B)), %    
@@ -343,7 +348,7 @@ col_is_filled(R, W):-
     % colors(T, T_str),
     set_dynamic_bool_false,
     get_row(R, W, Full_Row),
-    print(Full_Row),
+    % print(Full_Row),
     % findall(X, nth0(T, Full_Row, X), V),
     cumplen_todos(Full_Row, dif_0),
     set_dynamic_bool_true.

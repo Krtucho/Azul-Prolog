@@ -443,13 +443,13 @@ put_tile_in_wall(0,Player,Row,Color):-
 
     retract(players(Player,S,R1,R2,R3,R4,R5,Matrix,D)),
     assert(players(Player,S,R1,R2,R3,R4,R5,New_Matrix,D)),
-    format("Jugador: ~a Fila: ~a Columna: ~a ~n", [Player, Row_Matrix, Column]),
-    % calculate_score(Row_Matrix,Column, Matrix, Score_to_Add),%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Descomentar
-    Score_to_Add is 1,%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%comentar
-    print("Matrix"),
-    format("~n"),
-    print_wall(New_Matrix),
-    format("Puntuacion a annadir: ~a ~n", [Score_to_Add]),
+    % format("Jugador: ~a Fila: ~a Columna: ~a ~n", [Player, Row_Matrix, Column]),    
+    calculate_score(Row_Matrix,Column, Matrix, Score_to_Add),
+    % print("Matrix"),
+    % format("~n"),
+    % print_wall(New_Matrix),
+    % format("Puntuacion sumada en este turno: ~a ~n", [Score_to_Add]),
+    
     empty_n_row_of_player(Player,Row),
     add_score(Player, Score_to_Add).
 put_tile_in_wall(N,_,_,_).
@@ -499,7 +499,7 @@ player_fill_row(Players_number,End):-
 refill_bag_from_cementery(N):- N >= 0,!.
 refill_bag_from_cementery(N):- 
     cementery('total',Total),
-    format("Se van a pasar ~a azulejos del cementerio a la bolsa ~n",[Total]),
+    % format("Se van a pasar ~a azulejos del cementerio a la bolsa ~n",[Total]),
     refill_bag().
 
 %devuelve 1 si no quedan suficientes fichas para rellenar las fabricas y 0 en caso contrario
@@ -545,8 +545,8 @@ select_better_score(_,_).
 %imprime las puntuaciones
 print_scores(0):-!,
     winner(Winner,Score),
-    format("El ganador de la partida es el jugador ~a con puntuacion ~a ~n~n",[Winner,Score]),
-    abort.
+    format("El ganador de la partida es el jugador ~a con puntuacion ~a ~n~n",[Winner,Score]).
+    % abort.
 print_scores(Players_number):-
     players(Players_number,Score,_,_,_,_,_,_,_),
     format("El jugador ~a tiene puntuacion ~a ~n",[Players_number,Score]),

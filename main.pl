@@ -62,7 +62,7 @@ get_really_score(Bad_Score,S_New):- Bad_Score >= 0, S_New is Bad_Score.
 %se da por terminado el juego
 end_of_round(0):-!.
 end_of_round(Players_number):-      
-    format("Antes de aplicar los cambios ~n"),
+    format("~n Antes de aplicar los cambios."),
     print_player_details(Players_number),    
     check_every_row(5,Players_number),
     players(Players_number,S_Old,R1,R2,R3,R4,R5,M,D_Old),
@@ -71,7 +71,7 @@ end_of_round(Players_number):-
     Bad_Score is S_Old + Drop_Score,
     get_really_score(Bad_Score,S_New),
     assert(players(Players_number,S_New,R1,R2,R3,R4,R5,M,0)),
-    format("Despues de aplicar los cambios ~n"),
+    format("~nDespues de aplicar los cambios."),
     print_player_details(Players_number),
     Players_number1 is Players_number-1,
     end_of_round(Players_number1).
@@ -89,7 +89,7 @@ comprobate_end_game(Players_number,Factories_number):-
 new_round(0,Players_number,Factories_number):-
     format("Como no se ha concluido el juego, se comienza una nueva ronda. ~n"),
     round(Players_number,Factories_number).
-
+new_round(_,_,_).
 
 %desarrollo de una ronda 
 round(Players_number,Factories_number):-
@@ -110,7 +110,7 @@ round(Players_number,Factories_number):-
     play_to_end_round(1,Actual_Player,Players_number),
     format("Se terminaron los azulejos en las fabricas y el centro, momento de la Fase II: Revestir el Muro. ~n"),
     end_of_round(Players_number),
-    format("Comienzo de la Fase III: Mantenimiento. ~n"),
+    format("~nComienzo de la Fase III: Mantenimiento. ~n"),
     comprobate_end_game(Players_number,Factories_number).
 
 
